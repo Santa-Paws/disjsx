@@ -1,0 +1,55 @@
+{
+	"name": "disjsx",
+	"version": "0.0.10",
+	"main": "./dist/node/index.js",
+	"module": "./dist/node/index.js",
+	"devDependencies": {
+		"@types/bun": "latest",
+		"eslint": "9.24.0",
+		"eslint-plugin-prefer-arrow": "^1.2.3",
+		"eslint-plugin-react-compiler": "^19.0.0-beta-e993439-20250405",
+		"eslint-plugin-react-hooks": "^5.2.0",
+		"eslint-plugin-react-refresh": "^0.4.19",
+		"globals": "^16.0.0",
+		"prettier": "^3.5.3",
+		"typescript-eslint": "^8.29.1",
+		"@types/react": "^19.0.0"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	},
+	"dependencies": {
+		"react": "^19.0.0"
+	},
+	"exports": {
+		".": {
+			"types": "./dist/types/index.d.ts",
+			"bun": "./dist/bun/index.js",
+			"node": "./dist/node/index.js",
+			"default": "./dist/node/index.js"
+		}
+	},
+	"description": "A library for creating Discord messages in JSX",
+	"files": [
+		"dist/**/*",
+		"index.js"
+	],
+	"license": "MIT",
+	"private": false,
+	"scripts": {
+		"build:node": "bun build ./src/index.ts --outdir ./dist/node --sourcemap --minify --target node --format esm --define:bundleType='\"node-bundle\"' --define:BUNDLE_ID='\"NODE_OPTIMIZED\"'",
+		"build:bun": "bun build ./src/index.ts --outdir ./dist/bun --sourcemap --minify --target bun --define:bundleType='\"bun-bundle\"' --define:BUNDLE_ID='\"BUN_OPTIMIZED\"'",
+		"build:types": "tsc --project ./tsconfig.build.json",
+		"clean": "rm -rf dist",
+		"build": "npm run clean && npm run build:node && npm run build:bun && npm run build:types",
+		"prepublish": "npm run build && npm pack",
+		"format": "bunx prettier --write .",
+		"release": "npm run prepublish && npm publish"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Santa-Paws/disjsx"
+	},
+	"type": "module",
+	"types": "./dist/node/index.d.ts"
+}

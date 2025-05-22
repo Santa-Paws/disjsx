@@ -1,0 +1,7 @@
+**/*.template.ts
+
+dev-tests/**
+
+**/*.jsonc
+
+.vscode/**
