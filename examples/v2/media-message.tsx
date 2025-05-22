@@ -1,4 +1,3 @@
-// v2-media-message.tsx
 import { Message, MediaGallery, MediaGalleryItem, File, TextDisplay, renderDiscordMessage } from "disjsx";
 
 const V2MediaMessage = () => {
@@ -26,8 +25,8 @@ const V2MediaMessage = () => {
 };
 
 // Note: For 'attachment://' URLs to work, the files (local-image.jpg, document.pdf, archive.zip)
-// would need to be included in the multipart/form-data request when sending the message to Discord.
-// renderDiscordMessage only generates the JSON payload.
+// Note: would need to be included in the multipart/form-data request when sending the message to Discord.
+// Note: renderDiscordMessage only generates the JSON payload.
 
 console.log(
 	"Media Message:",

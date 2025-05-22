@@ -1,4 +1,3 @@
-// interactive-message.tsx
 import {
 	Message,
 	ActionRow,

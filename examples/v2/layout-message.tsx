@@ -1,4 +1,3 @@
-// v2-layout-message.tsx
 import {
 	Message,
 	Section,

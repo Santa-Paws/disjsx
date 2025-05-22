@@ -1,4 +1,3 @@
-// embed-message.tsx
 import {
 	Message,
 	Embed,

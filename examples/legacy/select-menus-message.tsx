@@ -1,4 +1,3 @@
-// select-menus-message.tsx
 import {
 	Message,
 	ActionRow,
