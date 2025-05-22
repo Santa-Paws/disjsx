@@ -1,4 +1,4 @@
-# D.JSX (Discord JSX)
+# DisJSX (Discord JSX)
 
 blah blah write Discord messages in JSX blah blah (I suck at writing ReadMe's)
 

@@ -1,6 +1,6 @@
 {
 	"name": "disjsx",
-	"version": "0.0.10",
+	"version": "0.1.0",
 	"main": "./dist/node/index.js",
 	"module": "./dist/node/index.js",
 	"devDependencies": {
@@ -44,6 +44,8 @@
 		"build": "npm run clean && npm run build:node && npm run build:bun && npm run build:types",
 		"prepublish": "npm run build && npm pack",
 		"format": "bunx prettier --write .",
+		"lint": "bunx eslint .",
+		"lint:fix": "bunx eslint --fix .",
 		"release": "npm run prepublish && npm publish"
 	},
 	"repository": {
