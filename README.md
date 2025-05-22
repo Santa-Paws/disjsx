@@ -1,8 +1,87 @@
 # DisJSX (Discord JSX)
 
-blah blah write Discord messages in JSX blah blah (I suck at writing ReadMe's)
+DisJSX is a library for creating Discord messages in JSX. It supports both legacy and v2 message systems. Do note, this is NOT for rendering messages in the browser on a react site, rendered messages return a JSON object and not a usable react component.
 
-## Usage
+## Installation
+
+```bash
+npm install disjsx
+```
+
+## Examples
+
+### Legacy Messages
+
+You can create simple messages with just a `Message` and `Content` component.
+
+```tsx
+import { Message, Content, renderDiscordMessage } from "disjsx";
+
+const message = (
+	<Message>
+		<Content>Hello world!</Content>
+	</Message>
+);
+
+console.log(renderDiscordMessage(message)); // { content: "Hello world!" }
+```
+
+You can also create embeds like so:
+
+```tsx
+import { Message, Embed, EmbedTitle, EmbedDescription, EmbedAuthor, EmbedField, EmbedFields, EmbedFieldTitle, EmbedFieldValue, EmbedFooter, EmbedImage, EmbedThumbnail, Colors, renderDiscordMessage } from "disjsx";
+
+const message = (
+    <Message>
+			<Embed color={Colors.Purple} timestamp={new Date()} url="https://discord.com">
+				<EmbedAuthor
+					name="John Doe"
+					iconUrl="https://cdn.discordapp.com/embed/avatars/0.png"
+					url="https://github.com"
+				/>
+				<EmbedTitle>This is an Embed Title!</EmbedTitle>
+				<EmbedDescription>
+					This is a rich embed description. It can contain **markdown** and links like [this one](https://discord.com).
+				</EmbedDescription>
+				<EmbedThumbnail url="https://cdn.discordapp.com/embed/avatars/1.png" />
+				<EmbedFields>
+					<EmbedField title="Field 1 (Inline)" value="Value 1" inline />
+					<EmbedField title="Field 2 (Inline)" value="Value 2" inline />
+					<EmbedField title="Field 3 (Not Inline)" value="Value 3" />
+					<EmbedField inline>
+						<EmbedFieldTitle>Field 4 Title (Child)</EmbedFieldTitle>
+						<EmbedFieldValue>Field 4 Value (Child)</EmbedFieldValue>
+					</EmbedField>
+				</EmbedFields>
+				<EmbedImage url="https://placehold.co/1024/45BFEA/FFFFFF.png?text=Cats%20Are%20Cool" />
+				<EmbedFooter text="This is the footer text" iconUrl="https://cdn.discordapp.com/embed/avatars/2.png" />
+			</Embed>
+			<Embed title="Minimal Embed" description="Just title and description." color={0x00ff00} />
+	</Message>
+)
+
+console.log(renderDiscordMessage(message)) // { embeds: [{...}] }
+```
+
+### V2 Messages
+
+You can create v2 messages with the `Message` component and the `isV2` prop.
+
+```tsx
+import { Message, Section, TextDisplay, renderDiscordMessage } from "disjsx";
+
+const message = (
+  <Message isV2>
+    <Section>
+      <TextDisplay>Hello world!</TextDisplay>
+    </Section>
+  </Message>
+)
+
+console.log(renderDiscordMessage(message)) // { components: [{...}], flags: 32768 }
+```
+
+## Documentation
 
 ## `<Message>`
 
@@ -291,9 +370,10 @@ Represents a Container component for V2 messages. Visually groups a set of compo
 
 ---
 
-**Note on Enums:**
+**Notes:**
 
 - `Colors`: Provides predefined color values (e.g., `Colors.Blurple`, `Colors.Red`).
 - `ButtonStyle`: Defines styles for buttons (e.g., `ButtonStyle.Primary`, `ButtonStyle.Link`).
 - `MessageFlags`: For advanced message control (e.g., `MessageFlags.Ephemeral`). `IsComponentsV2` (`1 << 15`) is automatically handled by `Message isV2={true}`.
 - `ChannelTypes`: Provides predefined channel types (e.g., `ChannelTypes.GuildText`, `ChannelTypes.GuildAnnouncement`).
+- `renderDiscordMessage`: This function is used to render the message to a JSON object.
