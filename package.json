@@ -53,5 +53,13 @@
 		"url": "https://github.com/Santa-Paws/disjsx"
 	},
 	"type": "module",
-	"types": "./dist/node/index.d.ts"
+	"types": "./dist/node/index.d.ts",
+	"keywords": [
+		"discord",
+		"jsx",
+		"discord.js",
+		"discord.ts",
+		"discord.jsx",
+		"discord.tsx"
+	]
 }
