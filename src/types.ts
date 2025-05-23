@@ -1,4 +1,9 @@
 /* eslint-disable @typescript-eslint/no-empty-object-type */
+
+import type { ReactElement } from "react";
+
+import type { ReactNode } from "react";
+
 /**
  * @see {@link https://discord.com/developers/docs/resources/channel#message-object-message-flags}
  * taken from "discord-api-types": @see {@link https://github.com/discordjs/discord-api-types/blob/main/payloads/v10/channel.ts#L887}
@@ -73,7 +78,8 @@ export enum ComponentType {
 	Button = 2,
 	/** Select menu for picking from defined text options. */
 	StringSelect = 3,
-	// Note: Text Input (type 4) is in the documentation but not in this enum.
+	/** Text input object. */
+	TextInput = 4,
 	/** Select menu for users. */
 	UserSelect = 5,
 	/** Select menu for roles. */
@@ -201,6 +207,31 @@ export enum ChannelTypes {
 	GuildForum = 15,
 	/** A media channel within a server. */
 	GuildMedia = 16,
+}
+
+/**
+ * An interaction callback type
+ * @see {@link https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type}
+ */
+export enum InteractionType {
+	/** Acknowledge a ping */
+	Pong = 1,
+	/** Respond to an interaction with a message */
+	ChannelMessageWithSource = 4,
+	/** Acknowledge an interaction and edit a response later, the user sees a loading state */
+	DeferredChannelMessageWithSource = 5,
+	/** Acknowledge an interaction and edit a response later, the user sees a loading state */
+	DeferredUpdateMessage = 6,
+	/** For components, acknowledge an interaction and edit the original message later; the user does not see a loading state */
+	UpdateMessage = 7,
+	/** For components, edit the message the component was attached to */
+	ApplicationCommandAutocompleteResult = 8,
+	/** Respond to an interaction with a popup modal */
+	Modal = 9,
+	/** Deprecated; respond to an interaction with an upgrade button, only available for apps with monetization enabled */
+	PremiumRequired = 10,
+	/** Launch the Activity associated with the app. Only available for apps with Activities enabled */
+	LaunchActivity = 12,
 }
 
 /**
@@ -745,6 +776,47 @@ interface ChannelSelectPayload extends InteractiveComponent {
 	disabled?: boolean;
 }
 
+/** Props for a text input component (used in modals). */
+export interface TextInputProps {
+	/** Developer-defined identifier for the input, max 100 characters. */
+	customId: string;
+	/** The Text Input Style. */
+	style: TextInputStyle;
+	/** Label for this component, max 45 characters. */
+	label: string;
+	/** Minimum input length for a text input; min 0, max 4000. */
+	minLength?: number;
+	/** Maximum input length for a text input; min 1, max 4000. */
+	maxLength?: number;
+	/** Whether this component is required to be filled. Defaults to `true`. */
+	required?: boolean;
+	/** Pre-filled value for this component, max 4000 characters. */
+	value?: string;
+	/** Custom placeholder text if the input is empty, max 100 characters. */
+	placeholder?: string;
+	/** Optional identifier for the component. */
+	id?: number;
+}
+
+/** Payload for a text input component. */
+interface TextInputPayload extends InteractiveComponent {
+	type: ComponentType.TextInput;
+	/** The Text Input Style. */
+	style: TextInputStyle;
+	/** Label for this component, max 45 characters. */
+	label: string;
+	/** Minimum input length for a text input; min 0, max 4000. */
+	min_length?: number;
+	/** Maximum input length for a text input; min 1, max 4000. */
+	max_length?: number;
+	/** Whether this component is required to be filled. Defaults to `true`. */
+	required?: boolean;
+	/** Pre-filled value for this component, max 4000 characters. */
+	value?: string;
+	/** Custom placeholder text if the input is empty, max 100 characters. */
+	placeholder?: string;
+}
+
 // Embed related structures (common for Discord messages)
 // These are not fully detailed in the provided "Component Reference" for V2 components,
 // but are relevant for legacy messages and general Discord message structure.
@@ -907,6 +979,42 @@ export interface ContentProps {
 }
 
 /**
+ * Props for a modal.
+ * @see {@link https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-modal}
+ */
+export interface ModalProps {
+	/** The title of the popup modal, max 45 characters. */
+	title: string;
+	/** Developer-defined identifier for the modal, max 100 characters. */
+	customId: string;
+	/**
+	 * Child components. Can only contain Action Rows with Text Input components.
+	 */
+	children: React.ReactNode;
+}
+
+/**
+ * Payload structure for a modal.
+ */
+interface ModalData {
+	/** The title of the popup modal, max 45 characters. */
+	title: string;
+	/** Developer-defined identifier for the modal, max 100 characters. */
+	custom_id: string;
+	/** Array of Action Row components containing Text Input components. */
+	components: ActionRowPayload[];
+}
+
+/**
+ * The actual payload for a modal
+ * @see {@link https://discord.com/developers/docs/interactions/receiving-and-responding#responding-to-an-interaction}
+ */
+interface ModalPayload {
+	type: InteractionType.Modal;
+	data: ModalData;
+}
+
+/**
  * Props for a message.
  */
 export interface MessageProps {
@@ -977,6 +1085,7 @@ type AnyComponentPayload =
 	| RoleSelectPayload
 	| MentionableSelectPayload
 	| ChannelSelectPayload
+	| TextInputPayload
 	| SectionPayload
 	| TextDisplayPayload
 	| ThumbnailPayload
@@ -993,6 +1102,7 @@ export type {
 	BaseMessagePayload,
 	LegacyMessagePayload,
 	V2MessagePayload,
+	ModalData,
 	AnyComponentPayload,
 	ActionRowPayload,
 	ButtonPayload,
@@ -1001,6 +1111,7 @@ export type {
 	RoleSelectPayload,
 	MentionableSelectPayload,
 	ChannelSelectPayload,
+	TextInputPayload,
 	SectionPayload,
 	TextDisplayPayload,
 	ThumbnailPayload,
@@ -1011,4 +1122,7 @@ export type {
 	SelectOptionPayload,
 	BaseSelectProps,
 	MediaGalleryItemPayload,
+	ModalPayload,
 };
+
+export type ReactNodeType<T = unknown> = ReactElement<T> | ReactNode;

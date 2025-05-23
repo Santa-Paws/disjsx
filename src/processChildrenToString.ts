@@ -1,6 +1,6 @@
 import type { JSXElementConstructor } from "react";
 
-import { getProcessedElement } from "@djsx/utils.ts";
+import { getProcessedElement } from "@disjsx/utils.ts";
 import type { ReactElement } from "react";
 import type { ReactNode } from "react";
 import { Children, isValidElement } from "react";

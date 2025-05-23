@@ -8,11 +8,11 @@ import {
 	type EmbedThumbnailProps,
 	type EmbedPayload,
 } from "../types";
-import { DJSX } from "../djsxTypes";
+import { DISJSX } from "../disjsxTypes";
 import { type NodeProcessor } from "./types";
 
 export const EmbedNode: NodeProcessor<EmbedPayload, EmbedProps> = {
-	process: (element, _, processChildrenToString, getDJSXType, getProcessedElement) => {
+	process: (element, _, processChildrenToString, getDISJSXType, getProcessedElement) => {
 		const embedProps = element.props;
 		const payload: EmbedPayload = {
 			title: embedProps.title,
@@ -31,10 +31,10 @@ export const EmbedNode: NodeProcessor<EmbedPayload, EmbedProps> = {
 			}
 
 			const child = getProcessedElement(rawChild);
-			const childType = getDJSXType(child);
+			const childType = getDISJSXType(child);
 
 			switch (childType) {
-				case DJSX.EmbedAuthor: {
+				case DISJSX.EmbedAuthor: {
 					const authorProps = child.props as EmbedAuthorProps;
 
 					payload.author = {
@@ -45,7 +45,7 @@ export const EmbedNode: NodeProcessor<EmbedPayload, EmbedProps> = {
 					break;
 				}
 
-				case DJSX.EmbedTitle: {
+				case DISJSX.EmbedTitle: {
 					if (!payload.title) {
 						payload.title = processChildrenToString((child.props as { children: ReactNode }).children);
 					}
@@ -53,14 +53,14 @@ export const EmbedNode: NodeProcessor<EmbedPayload, EmbedProps> = {
 					break;
 				}
 
-				case DJSX.EmbedDescription: {
+				case DISJSX.EmbedDescription: {
 					const description = processChildrenToString((child.props as { children: ReactNode }).children);
 
 					tempDescription += (tempDescription ? "\n" : "") + description;
 					break;
 				}
 
-				case DJSX.EmbedFooter: {
+				case DISJSX.EmbedFooter: {
 					const footerProps = child.props as EmbedFooterProps;
 
 					payload.footer = {
@@ -70,21 +70,21 @@ export const EmbedNode: NodeProcessor<EmbedPayload, EmbedProps> = {
 					break;
 				}
 
-				case DJSX.EmbedImage: {
+				case DISJSX.EmbedImage: {
 					payload.image = {
 						url: (child.props as EmbedImageProps).url,
 					};
 					break;
 				}
 
-				case DJSX.EmbedThumbnail: {
+				case DISJSX.EmbedThumbnail: {
 					payload.thumbnail = {
 						url: (child.props as EmbedThumbnailProps).url,
 					};
 					break;
 				}
 
-				case DJSX.EmbedFields: {
+				case DISJSX.EmbedFields: {
 					const fieldChildren = Children.toArray((child.props as { children: ReactNode }).children);
 
 					for (const rawFieldChild of fieldChildren) {
@@ -94,7 +94,7 @@ export const EmbedNode: NodeProcessor<EmbedPayload, EmbedProps> = {
 
 						const fieldChild = getProcessedElement(rawFieldChild);
 
-						if (getDJSXType(fieldChild) !== DJSX.EmbedField) {
+						if (getDISJSXType(fieldChild) !== DISJSX.EmbedField) {
 							continue;
 						}
 
@@ -110,11 +110,11 @@ export const EmbedNode: NodeProcessor<EmbedPayload, EmbedProps> = {
 								}
 
 								const subChild = getProcessedElement(rawSubChild);
-								const subChildType = getDJSXType(subChild);
+								const subChildType = getDISJSXType(subChild);
 
-								if (subChildType === DJSX.EmbedFieldTitle && !fieldName) {
+								if (subChildType === DISJSX.EmbedFieldTitle && !fieldName) {
 									fieldName = processChildrenToString((subChild.props as { children: ReactNode }).children);
-								} else if (subChildType === DJSX.EmbedFieldValue && !fieldValue) {
+								} else if (subChildType === DISJSX.EmbedFieldValue && !fieldValue) {
 									fieldValue = processChildrenToString((subChild.props as { children: ReactNode }).children);
 								}
 							}

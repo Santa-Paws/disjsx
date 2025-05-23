@@ -6,11 +6,11 @@ import {
 	type SelectOptionPayload,
 	ComponentType,
 } from "../types";
-import { DJSX } from "../djsxTypes";
+import { DISJSX } from "../disjsxTypes";
 import { type NodeProcessor } from "./types";
 
 export const StringSelectNode: NodeProcessor<StringSelectPayload, StringSelectProps> = {
-	process: (element, _, __, getDJSXType, getProcessedElement) => {
+	process: (element, _, __, getDISJSXType, getProcessedElement) => {
 		const selProps = element.props;
 		const options: SelectOptionPayload[] = [];
 
@@ -21,7 +21,7 @@ export const StringSelectNode: NodeProcessor<StringSelectPayload, StringSelectPr
 
 			const childNode = getProcessedElement(rawChildNode);
 
-			if (getDJSXType(childNode) !== DJSX.SelectOption) {
+			if (getDISJSXType(childNode) !== DISJSX.SelectOption) {
 				continue;
 			}
 			const optProps = childNode.props as SelectOptionProps;

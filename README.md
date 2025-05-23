@@ -129,6 +129,169 @@ console.log(renderDiscordMessage(message));
 // Output: { components: [{ type: 9, ... }], flags: 32768 }
 ```
 
+### Modals
+
+DisJSX also supports creating Discord modals for collecting user input. Modals are popup dialogs that can contain text input fields.
+
+```tsx
+import { Modal, ActionRow, TextInput, TextInputStyle, renderDiscordModal } from "disjsx";
+
+const userProfileModal = (
+	<Modal title="Edit Profile" customId="profile_modal">
+		<ActionRow>
+			<TextInput
+				customId="username"
+				label="Username"
+				style={TextInputStyle.Short}
+				placeholder="Enter your username"
+				maxLength={32}
+				required={true}
+			/>
+		</ActionRow>
+		<ActionRow>
+			<TextInput
+				customId="bio"
+				label="Bio"
+				style={TextInputStyle.Paragraph}
+				placeholder="Tell us about yourself..."
+				maxLength={1000}
+				required={false}
+			/>
+		</ActionRow>
+		<ActionRow>
+			<TextInput
+				customId="email"
+				label="Email"
+				style={TextInputStyle.Short}
+				placeholder="user@example.com"
+				required={true}
+			/>
+		</ActionRow>
+	</Modal>
+);
+
+console.log(renderDiscordModal(userProfileModal));
+// Output: { type: 9, data: { title: "Edit Profile", custom_id: "profile_modal", components: [...] } }
+```
+
+## Validation System
+
+DisJSX includes a comprehensive validation system that helps you catch errors before sending your payloads to Discord. The validation system checks for:
+
+- **Component Placement Rules:** Ensures components are placed in valid containers (e.g., buttons only in Action Rows)
+- **Character Limits:** Validates that text content doesn't exceed Discord's limits
+- **Component Limits:** Checks maximum numbers of components, fields, options, etc.
+- **Required Properties:** Ensures all required props are provided
+- **Custom ID Uniqueness:** Prevents duplicate custom IDs within a message or modal
+- **Button Style Requirements:** Validates that buttons have the correct props for their style
+
+### Basic Validation
+
+By default, validation is enabled for both `renderDiscordMessage` and `renderDiscordModal`:
+
+```tsx
+import { Message, Content, renderDiscordMessage } from "disjsx";
+
+const message = (
+	<Message>
+		<Content>{"A".repeat(3000)}</Content> {/* Too long! */}
+	</Message>
+);
+
+// This will log validation errors to the console and return null
+const result = renderDiscordMessage(message);
+// Console output: "DisJSX Validation Errors: - Message content cannot exceed 2000 characters"
+```
+
+### Validation Options
+
+You can customize validation behavior with options:
+
+```tsx
+import { Message, Content, renderDiscordMessage } from "disjsx";
+
+const message = (
+	<Message>
+		<Content>Valid content</Content>
+	</Message>
+);
+
+// Disable validation entirely
+const unvalidatedResult = renderDiscordMessage(message, { validate: false });
+
+// Enable validation with error throwing
+try {
+	const result = renderDiscordMessage(message, { 
+		validate: true, 
+		throwOnValidationError: true 
+	});
+} catch (error) {
+	console.error("Validation failed:", error.message);
+}
+```
+
+### Manual Validation
+
+You can also validate components manually without rendering:
+
+```tsx
+import { Message, Button, ActionRow, ButtonStyle, validateComponent } from "disjsx";
+
+const message = (
+	<Message>
+		<ActionRow>
+			<Button style={ButtonStyle.Primary} customId="test">
+				Click me
+			</Button>
+		</ActionRow>
+	</Message>
+);
+
+const validationResult = validateComponent(message, false, "message");
+
+if (!validationResult.isValid) {
+	console.log("Validation errors:", validationResult.errors);
+	console.log("Validation warnings:", validationResult.warnings);
+}
+```
+
+### Validation Error Types
+
+The validation system provides detailed error information:
+
+```tsx
+interface ValidationError {
+	type: "error" | "warning";
+	message: string;
+	component?: string;
+	componentId?: number;
+	path?: string[];
+}
+```
+
+Common validation rules include:
+
+- **Character Limits:**
+  - Message content: 2000 characters
+  - Embed title: 256 characters
+  - Embed description: 4096 characters
+  - Button label: 80 characters
+  - Custom ID: 100 characters
+
+- **Component Limits:**
+  - V2 messages: 40 total components
+  - Legacy messages: 5 Action Rows maximum
+  - Action Rows: 5 buttons OR 1 select menu
+  - String Select: 25 options maximum
+  - Embed fields: 25 maximum
+  - Media Gallery: 1-10 items
+
+- **Placement Rules:**
+  - Buttons must be in Action Rows
+  - TextInput only in modals
+  - Embeds only in legacy messages
+  - V2 components only in V2 messages
+
 ## Component Reference
 
 This section details the DisJSX components and how they map to Discord's message structures.
@@ -148,6 +311,17 @@ Represents a Discord message, the top-level container for all content. Supports 
   - `avatarUrl?: string`: Overrides the default avatar of the webhook/bot.
   - `tts?: boolean`: Whether this is a text-to-speech message.
   - `flags?: number`: Additional message flags combined as a bitfield. `32768` is automatically added if `isV2` is true.
+
+---
+
+### `<Modal>`
+
+Represents a Discord modal dialog for collecting user input. Modals are popup forms that can contain text input fields.
+
+- **Props (`ModalProps`):**
+  - `title: string`: The title of the popup modal (max 45 characters).
+  - `customId: string`: Developer-defined identifier for the modal (max 100 characters). This is sent back when the modal is submitted.
+  - `children: React.ReactNode`: Can only contain `<ActionRow>` components with `<TextInput>` components inside.
 
 ---
 
@@ -306,6 +480,25 @@ _Must be placed within an `<ActionRow>` or as a `<Section>` accessory (V2 only).
   - `skuId?: string`: Identifier for a purchasable SKU for `ButtonStyle.Premium` buttons.
   - `emoji?: EmojiObject`: Partial emoji object (`{ id?: string, name?: string, animated?: boolean }`) to display on the button.
   - `disabled?: boolean`: Whether the button is disabled (defaults to `false`).
+  - `id?: number`: Optional identifier for the component.
+
+---
+
+### `<TextInput>` (Interactive Component - Modals Only)
+
+Represents a text input field for collecting user input in modals. Text inputs come in two styles: short (single-line) and paragraph (multi-line).
+
+- **Props (`TextInputProps`):**
+  - `customId: string`: Developer-defined identifier for the input (max 100 characters). This is sent back when the modal is submitted. Must be unique within the modal.
+  - `style: TextInputStyle`: The style of the text input:
+    - `TextInputStyle.Short`: Single-line input field
+    - `TextInputStyle.Paragraph`: Multi-line input field (textarea)
+  - `label: string`: Label text displayed above the input field (max 45 characters).
+  - `placeholder?: string`: Placeholder text displayed when the input is empty (max 100 characters).
+  - `value?: string`: Pre-filled value for the input (max 4000 characters).
+  - `required?: boolean`: Whether the input must be filled before submitting the modal (defaults to `true`).
+  - `minLength?: number`: Minimum input length (0-4000).
+  - `maxLength?: number`: Maximum input length (1-4000).
   - `id?: number`: Optional identifier for the component.
 
 ---
@@ -526,6 +719,10 @@ DisJSX provides several utility objects/enums that map to Discord constants:
   	Accept
   </Button>
   ```
+- **`TextInputStyle`**: Defines styles for `<TextInput>` components (e.g., `TextInputStyle.Short`, `TextInputStyle.Paragraph`).
+  ```tsx
+  <TextInput style={TextInputStyle.Paragraph} customId="description" label="Description" />
+  ```
 - **`MessageFlags`**: For advanced message control (e.g., `MessageFlags.Ephemeral`). The `IsComponentsV2` flag (`1 << 15` or `32768`) is automatically handled by `<Message isV2={true}>`.
   ```tsx
   <Message flags={MessageFlags.Ephemeral} isV2>
@@ -539,7 +736,9 @@ DisJSX provides several utility objects/enums that map to Discord constants:
 
 ## Final Rendering
 
-Remember to always use the `renderDiscordMessage` function to convert your DisJSX tree into the JSON payload expected by Discord:
+Remember to always use the appropriate rendering function to convert your DisJSX tree into the JSON payload expected by Discord:
+
+### For Messages
 
 ```tsx
 import { Message, Content, renderDiscordMessage } from "disjsx";
@@ -554,3 +753,23 @@ const discordPayload = renderDiscordMessage(myJsxMessage);
 // Send discordPayload to the Discord API
 console.log(discordPayload);
 ```
+
+### For Modals
+
+```tsx
+import { Modal, ActionRow, TextInput, TextInputStyle, renderDiscordModal } from "disjsx";
+
+const myJsxModal = (
+	<Modal title="User Input" customId="user_input_modal">
+		<ActionRow>
+			<TextInput customId="name" label="Your Name" style={TextInputStyle.Short} />
+		</ActionRow>
+	</Modal>
+);
+
+const modalPayload = renderDiscordModal(myJsxModal);
+// Use modalPayload in interaction responses
+console.log(modalPayload);
+```
+
+Both `renderDiscordMessage` and `renderDiscordModal` support the same validation options for comprehensive error checking and debugging.

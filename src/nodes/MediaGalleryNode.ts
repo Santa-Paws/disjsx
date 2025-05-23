@@ -6,11 +6,11 @@ import {
 	type MediaGalleryItemPayload,
 	ComponentType,
 } from "../types";
-import { DJSX } from "../djsxTypes";
+import { DISJSX } from "../disjsxTypes";
 import { type NodeProcessor } from "./types";
 
 export const MediaGalleryNode: NodeProcessor<MediaGalleryPayload, MediaGalleryProps> = {
-	process: (element, _, __, getDJSXType, getProcessedElement) => {
+	process: (element, _, __, getDISJSXType, getProcessedElement) => {
 		const galleryProps = element.props;
 		const items: MediaGalleryItemPayload[] = [];
 
@@ -20,7 +20,7 @@ export const MediaGalleryNode: NodeProcessor<MediaGalleryPayload, MediaGalleryPr
 			}
 			const childNode = getProcessedElement(rawChildNode);
 
-			if (getDJSXType(childNode) !== DJSX.MediaGalleryItem) {
+			if (getDISJSXType(childNode) !== DISJSX.MediaGalleryItem) {
 				continue;
 			}
 			const itemProps = childNode.props as MediaGalleryItemProps;

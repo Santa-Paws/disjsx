@@ -1,20 +1,20 @@
-import { nodeProcessors } from "@djsx/nodes/index.ts";
-import { processChildrenToString } from "@djsx/processChildrenToString.ts";
-import type { DJSX, TypedDJSXComponent } from "./djsxTypes";
+import { nodeProcessors } from "@disjsx/nodes/index.ts";
+import { processChildrenToString } from "@disjsx/processChildrenToString.ts";
+import type { DISJSX, TypedDISJSXComponent } from "./disjsxTypes";
 import { isValidElement, type ReactNode, type ReactElement } from "react";
 
 /**
- * Transforms a single React DJSX component node into its corresponding JSON payload object.
- * This function is the core of the DJSX to JSON transformation, mapping each
- * DJSX component (e.g., <ActionRow>, <Button>, <Embed>) and its props to the
+ * Transforms a single React DISJSX component node into its corresponding JSON payload object.
+ * This function is the core of the DISJSX to JSON transformation, mapping each
+ * DISJSX component (e.g., <ActionRow>, <Button>, <Embed>) and its props to the
  * structure expected by the target API (presumably Discord).
  *
- * It recursively processes children for components that can contain other DJSX elements
+ * It recursively processes children for components that can contain other DISJSX elements
  * (like ActionRow or Container). For textual content within components like TextDisplay
  * or Embed fields, it utilizes `processChildrenToString` to convert JSX children
  * into formatted strings.
  *
- * @param node The React node to process. Expected to be a DJSX component.
+ * @param node The React node to process. Expected to be a DISJSX component.
  * @returns A JSON payload object representing the component, or null if the node is invalid.
  */
 export const processNode = (node: ReactNode): unknown | null => {
@@ -23,20 +23,20 @@ export const processNode = (node: ReactNode): unknown | null => {
 	}
 
 	const element = getProcessedElement(node);
-	const componentDJSXType = getDJSXType(element);
+	const componentDISJSXType = getDISJSXType(element);
 
-	if (!componentDJSXType) {
+	if (!componentDISJSXType) {
 		return null;
 	}
 
-	const processor = nodeProcessors[componentDJSXType as keyof typeof nodeProcessors];
+	const processor = nodeProcessors[componentDISJSXType as keyof typeof nodeProcessors];
 
 	if (processor) {
 		return processor.process(
 			element as ReactElement<never, never>,
 			processNode,
 			processChildrenToString,
-			getDJSXType,
+			getDISJSXType,
 			getProcessedElement,
 		);
 	}
@@ -45,13 +45,13 @@ export const processNode = (node: ReactNode): unknown | null => {
 };
 
 /**
- * Helper function to get the DJSX type from a React node.
- * Handles both direct elements and function components that return DJSX elements.
+ * Helper function to get the DISJSX type from a React node.
+ * Handles both direct elements and function components that return DISJSX elements.
  * @param node The React node to inspect.
  * @param loop The number of times the function has been called.
- * @returns The DJSX type, or undefined if not a DJSX component.
+ * @returns The DISJSX type, or undefined if not a DISJSX component.
  */
-export const getDJSXType = (node: ReactNode, loop: number = 0): DJSX | undefined => {
+export const getDISJSXType = (node: ReactNode, loop: number = 0): DISJSX | undefined => {
 	if (loop > 10) {
 		return undefined;
 	}
@@ -63,15 +63,15 @@ export const getDJSXType = (node: ReactNode, loop: number = 0): DJSX | undefined
 	const { type, props } = node;
 
 	if (typeof type === "function") {
-		if ("djsxType" in type) {
-			return (type as TypedDJSXComponent<unknown, never>).djsxType;
+		if ("disjsxType" in type) {
+			return (type as TypedDISJSXComponent<unknown, never>).disjsxType;
 		}
 
 		// It's a regular functional component, try to render and recurse
 		// @ts-expect-error - TODO: fix this
 		const renderedOutput = type(props);
 
-		return getDJSXType(renderedOutput, loop + 1);
+		return getDISJSXType(renderedOutput, loop + 1);
 	}
 
 	// If type is a string (e.g., "div", "span"), it's a host component.
@@ -80,10 +80,10 @@ export const getDJSXType = (node: ReactNode, loop: number = 0): DJSX | undefined
 
 /**
  * Helper function to "unwrap" functional components until a host component
- * or a DJSX component (with `djsxType`) is reached.
+ * or a DISJSX component (with `disjsxType`) is reached.
  * @param element The React element to process.
  * @param loop The number of times the function has been called.
- * @returns The underlying host or DJSX React element.
+ * @returns The underlying host or DISJSX React element.
  * @throws TypeError if a functional component meant for unwrapping returns a non-element.
  */
 export const getProcessedElement = (element: ReactElement, loop: number = 0): ReactElement => {
@@ -91,7 +91,7 @@ export const getProcessedElement = (element: ReactElement, loop: number = 0): Re
 		return element;
 	}
 
-	if (typeof element.type === "function" && !("djsxType" in element.type)) {
+	if (typeof element.type === "function" && !("disjsxType" in element.type)) {
 		// @ts-expect-error - TODO: fix this
 		const renderedOutput = element.type(element.props);
 
@@ -100,13 +100,13 @@ export const getProcessedElement = (element: ReactElement, loop: number = 0): Re
 		}
 
 		console.error(
-			"Error in getProcessedElement: A functional component without 'djsxType' returned a non-element or null. Element:",
+			"Error in getProcessedElement: A functional component without 'disjsxType' returned a non-element or null. Element:",
 			element,
 			"Rendered output:",
 			renderedOutput,
 		);
 
-		throw new TypeError("DJSX: Functional component wrapper did not return a valid React element.");
+		throw new TypeError("DISJSX: Functional component wrapper did not return a valid React element.");
 	}
 
 	return element;

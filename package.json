@@ -1,6 +1,6 @@
 {
 	"name": "disjsx",
-	"version": "0.2.0",
+	"version": "1.0.0",
 	"main": "./dist/node/index.js",
 	"module": "./dist/node/index.js",
 	"devDependencies": {
@@ -53,7 +53,7 @@
 		"url": "https://github.com/Santa-Paws/disjsx"
 	},
 	"type": "module",
-	"types": "./dist/node/index.d.ts",
+	"types": "./dist/types/index.d.ts",
 	"keywords": [
 		"discord",
 		"jsx",

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
 	type MessageProps,
+	type ModalProps,
 	type ContentProps,
 	type EmbedProps,
 	type EmbedAuthorProps,
@@ -21,6 +22,7 @@ import {
 	type RoleSelectProps,
 	type MentionableSelectProps,
 	type ChannelSelectProps,
+	type TextInputProps,
 	type SectionProps,
 	type TextDisplayProps,
 	type ThumbnailProps,
@@ -32,44 +34,46 @@ import {
 } from "./types";
 
 /**
- * DJSX component types.
+ * DISJSX component types.
  *
- * These are used to identify the type of a DJSX component.
+ * These are used to identify the type of a DISJSX component.
  */
-export enum DJSX {
-	Message = "djsx:Message",
-	Content = "djsx:Content",
-	Embed = "djsx:Embed",
-	EmbedAuthor = "djsx:EmbedAuthor",
-	EmbedTitle = "djsx:EmbedTitle",
-	EmbedDescription = "djsx:EmbedDescription",
-	EmbedFields = "djsx:EmbedFields",
-	EmbedField = "djsx:EmbedField",
-	EmbedFieldTitle = "djsx:EmbedFieldTitle",
-	EmbedFieldValue = "djsx:EmbedFieldValue",
-	EmbedFooter = "djsx:EmbedFooter",
-	EmbedImage = "djsx:EmbedImage",
-	EmbedThumbnail = "djsx:EmbedThumbnail",
-	ActionRow = "djsx:ActionRow",
-	Button = "djsx:Button",
-	StringSelect = "djsx:StringSelect",
-	SelectOption = "djsx:SelectOption",
-	UserSelect = "djsx:UserSelect",
-	RoleSelect = "djsx:RoleSelect",
-	MentionableSelect = "djsx:MentionableSelect",
-	ChannelSelect = "djsx:ChannelSelect",
-	Section = "djsx:Section",
-	TextDisplay = "djsx:TextDisplay",
-	Thumbnail = "djsx:Thumbnail",
-	MediaGallery = "djsx:MediaGallery",
-	MediaGalleryItem = "djsx:MediaGalleryItem",
-	File = "djsx:File",
-	Separator = "djsx:Separator",
-	Container = "djsx:Container",
+export enum DISJSX {
+	Message = "disjsx:Message",
+	Modal = "disjsx:Modal",
+	Content = "disjsx:Content",
+	Embed = "disjsx:Embed",
+	EmbedAuthor = "disjsx:EmbedAuthor",
+	EmbedTitle = "disjsx:EmbedTitle",
+	EmbedDescription = "disjsx:EmbedDescription",
+	EmbedFields = "disjsx:EmbedFields",
+	EmbedField = "disjsx:EmbedField",
+	EmbedFieldTitle = "disjsx:EmbedFieldTitle",
+	EmbedFieldValue = "disjsx:EmbedFieldValue",
+	EmbedFooter = "disjsx:EmbedFooter",
+	EmbedImage = "disjsx:EmbedImage",
+	EmbedThumbnail = "disjsx:EmbedThumbnail",
+	ActionRow = "disjsx:ActionRow",
+	Button = "disjsx:Button",
+	StringSelect = "disjsx:StringSelect",
+	SelectOption = "disjsx:SelectOption",
+	UserSelect = "disjsx:UserSelect",
+	RoleSelect = "disjsx:RoleSelect",
+	MentionableSelect = "disjsx:MentionableSelect",
+	ChannelSelect = "disjsx:ChannelSelect",
+	TextInput = "disjsx:TextInput",
+	Section = "disjsx:Section",
+	TextDisplay = "disjsx:TextDisplay",
+	Thumbnail = "disjsx:Thumbnail",
+	MediaGallery = "disjsx:MediaGallery",
+	MediaGalleryItem = "disjsx:MediaGalleryItem",
+	File = "disjsx:File",
+	Separator = "disjsx:Separator",
+	Container = "disjsx:Container",
 }
 
-export interface TypedDJSXComponent<P, T extends DJSX> extends React.FC<P> {
-	djsxType: T;
+export interface TypedDISJSXComponent<P, T extends DISJSX> extends React.FC<P> {
+	disjsxType: T;
 }
 /* Message */
 
@@ -79,8 +83,17 @@ export interface TypedDJSXComponent<P, T extends DJSX> extends React.FC<P> {
  * @see {@link MessageProps}
  * @see {@link https://discord.com/developers/docs/resources/channel#message-object}
  */
-export const Message: TypedDJSXComponent<MessageProps, DJSX.Message> = (_props) => null;
-Message.djsxType = DJSX.Message;
+export const Message: TypedDISJSXComponent<MessageProps, DISJSX.Message> = (_props) => null;
+Message.disjsxType = DISJSX.Message;
+
+/**
+ * Represents a Discord modal dialog for collecting user input.
+ * Modals can only contain Action Rows with Text Input components.
+ * @see {@link ModalProps}
+ * @see {@link https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-modal}
+ */
+export const Modal: TypedDISJSXComponent<ModalProps, DISJSX.Modal> = (_props) => null;
+Modal.disjsxType = DISJSX.Modal;
 
 /**
  * Represents the main text content of a legacy Discord message.
@@ -88,8 +101,8 @@ Message.djsxType = DJSX.Message;
  * @see {@link ContentProps}
  * @see {@link https://discord.com/developers/docs/resources/channel#message-object-message-structure} (content field)
  */
-export const Content: TypedDJSXComponent<ContentProps, DJSX.Content> = (_props) => null;
-Content.djsxType = DJSX.Content;
+export const Content: TypedDISJSXComponent<ContentProps, DISJSX.Content> = (_props) => null;
+Content.disjsxType = DISJSX.Content;
 
 /**
  * Represents an embed object within a Discord message.
@@ -97,8 +110,8 @@ Content.djsxType = DJSX.Content;
  * @see {@link EmbedProps}
  * @see {@link https://discord.com/developers/docs/resources/channel#embed-object}
  */
-export const Embed: TypedDJSXComponent<EmbedProps, DJSX.Embed> = (_props) => null;
-Embed.djsxType = DJSX.Embed;
+export const Embed: TypedDISJSXComponent<EmbedProps, DISJSX.Embed> = (_props) => null;
+Embed.disjsxType = DISJSX.Embed;
 
 /**
  * Represents the author section of an embed.
@@ -106,32 +119,32 @@ Embed.djsxType = DJSX.Embed;
  * @see {@link EmbedAuthorProps}
  * @see {@link https://discord.com/developers/docs/resources/channel#embed-object-embed-author-structure}
  */
-export const EmbedAuthor: TypedDJSXComponent<EmbedAuthorProps, DJSX.EmbedAuthor> = (_props) => null;
-EmbedAuthor.djsxType = DJSX.EmbedAuthor;
+export const EmbedAuthor: TypedDISJSXComponent<EmbedAuthorProps, DISJSX.EmbedAuthor> = (_props) => null;
+EmbedAuthor.disjsxType = DISJSX.EmbedAuthor;
 
 /**
  * Represents the title of an embed.
  * @see {@link EmbedTitleProps}
  * @see {@link https://discord.com/developers/docs/resources/channel#embed-object-embed-structure} (title field)
  */
-export const EmbedTitle: TypedDJSXComponent<EmbedTitleProps, DJSX.EmbedTitle> = (_props) => null;
-EmbedTitle.djsxType = DJSX.EmbedTitle;
+export const EmbedTitle: TypedDISJSXComponent<EmbedTitleProps, DISJSX.EmbedTitle> = (_props) => null;
+EmbedTitle.disjsxType = DISJSX.EmbedTitle;
 
 /**
  * Represents the description text of an embed.
  * @see {@link EmbedDescriptionProps}
  * @see {@link https://discord.com/developers/docs/resources/channel#embed-object-embed-structure} (description field)
  */
-export const EmbedDescription: TypedDJSXComponent<EmbedDescriptionProps, DJSX.EmbedDescription> = (_props) => null;
-EmbedDescription.djsxType = DJSX.EmbedDescription;
+export const EmbedDescription: TypedDISJSXComponent<EmbedDescriptionProps, DISJSX.EmbedDescription> = (_props) => null;
+EmbedDescription.disjsxType = DISJSX.EmbedDescription;
 
 /**
  * Represents a container for multiple fields within an embed.
  * @see {@link EmbedFieldsProps}
  * @see {@link https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure}
  */
-export const EmbedFields: TypedDJSXComponent<EmbedFieldsProps, DJSX.EmbedFields> = (_props) => null;
-EmbedFields.djsxType = DJSX.EmbedFields;
+export const EmbedFields: TypedDISJSXComponent<EmbedFieldsProps, DISJSX.EmbedFields> = (_props) => null;
+EmbedFields.disjsxType = DISJSX.EmbedFields;
 
 /**
  * Represents a single field within an embed, consisting of a name (title) and a value.
@@ -139,24 +152,24 @@ EmbedFields.djsxType = DJSX.EmbedFields;
  * @see {@link EmbedFieldProps}
  * @see {@link https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure}
  */
-export const EmbedField: TypedDJSXComponent<EmbedFieldProps, DJSX.EmbedField> = (_props) => null;
-EmbedField.djsxType = DJSX.EmbedField;
+export const EmbedField: TypedDISJSXComponent<EmbedFieldProps, DISJSX.EmbedField> = (_props) => null;
+EmbedField.disjsxType = DISJSX.EmbedField;
 
 /**
  * Represents the title (name) part of an embed field.
  * @see {@link EmbedFieldTitleProps}
  * @see {@link https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure} (name field)
  */
-export const EmbedFieldTitle: TypedDJSXComponent<EmbedFieldTitleProps, DJSX.EmbedFieldTitle> = (_props) => null;
-EmbedFieldTitle.djsxType = DJSX.EmbedFieldTitle;
+export const EmbedFieldTitle: TypedDISJSXComponent<EmbedFieldTitleProps, DISJSX.EmbedFieldTitle> = (_props) => null;
+EmbedFieldTitle.disjsxType = DISJSX.EmbedFieldTitle;
 
 /**
  * Represents the value part of an embed field.
  * @see {@link EmbedFieldValueProps}
  * @see {@link https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure} (value field)
  */
-export const EmbedFieldValue: TypedDJSXComponent<EmbedFieldValueProps, DJSX.EmbedFieldValue> = (_props) => null;
-EmbedFieldValue.djsxType = DJSX.EmbedFieldValue;
+export const EmbedFieldValue: TypedDISJSXComponent<EmbedFieldValueProps, DISJSX.EmbedFieldValue> = (_props) => null;
+EmbedFieldValue.disjsxType = DISJSX.EmbedFieldValue;
 
 /**
  * Represents the footer section of an embed.
@@ -164,24 +177,24 @@ EmbedFieldValue.djsxType = DJSX.EmbedFieldValue;
  * @see {@link EmbedFooterProps}
  * @see {@link https://discord.com/developers/docs/resources/channel#embed-object-embed-footer-structure}
  */
-export const EmbedFooter: TypedDJSXComponent<EmbedFooterProps, DJSX.EmbedFooter> = (_props) => null;
-EmbedFooter.djsxType = DJSX.EmbedFooter;
+export const EmbedFooter: TypedDISJSXComponent<EmbedFooterProps, DISJSX.EmbedFooter> = (_props) => null;
+EmbedFooter.disjsxType = DISJSX.EmbedFooter;
 
 /**
  * Represents the main image of an embed.
  * @see {@link EmbedImageProps}
  * @see {@link https://discord.com/developers/docs/resources/channel#embed-object-embed-image-structure}
  */
-export const EmbedImage: TypedDJSXComponent<EmbedImageProps, DJSX.EmbedImage> = (_props) => null;
-EmbedImage.djsxType = DJSX.EmbedImage;
+export const EmbedImage: TypedDISJSXComponent<EmbedImageProps, DISJSX.EmbedImage> = (_props) => null;
+EmbedImage.disjsxType = DISJSX.EmbedImage;
 
 /**
  * Represents the thumbnail image of an embed, displayed in the top-right corner.
  * @see {@link EmbedThumbnailProps}
  * @see {@link https://discord.com/developers/docs/resources/channel#embed-object-embed-thumbnail-structure}
  */
-export const EmbedThumbnail: TypedDJSXComponent<EmbedThumbnailProps, DJSX.EmbedThumbnail> = (_props) => null;
-EmbedThumbnail.djsxType = DJSX.EmbedThumbnail;
+export const EmbedThumbnail: TypedDISJSXComponent<EmbedThumbnailProps, DISJSX.EmbedThumbnail> = (_props) => null;
+EmbedThumbnail.disjsxType = DISJSX.EmbedThumbnail;
 
 /* Action Row */
 
@@ -191,8 +204,8 @@ EmbedThumbnail.djsxType = DJSX.EmbedThumbnail;
  * @see {@link ActionRowProps}
  * @see {@link https://discord.com/developers/docs/interactions/message-components#action-row}
  */
-export const ActionRow: TypedDJSXComponent<ActionRowProps, DJSX.ActionRow> = (_props) => null;
-ActionRow.djsxType = DJSX.ActionRow;
+export const ActionRow: TypedDISJSXComponent<ActionRowProps, DISJSX.ActionRow> = (_props) => null;
+ActionRow.disjsxType = DISJSX.ActionRow;
 
 /**
  * Represents an interactive button component.
@@ -202,8 +215,8 @@ ActionRow.djsxType = DJSX.ActionRow;
  * @see {@link ButtonStyle}
  * @see {@link https://discord.com/developers/docs/interactions/message-components#button}
  */
-export const Button: TypedDJSXComponent<ButtonProps, DJSX.Button> = (_props) => null;
-Button.djsxType = DJSX.Button;
+export const Button: TypedDISJSXComponent<ButtonProps, DISJSX.Button> = (_props) => null;
+Button.disjsxType = DISJSX.Button;
 
 /**
  * Represents a String Select Menu, allowing users to choose from a list of predefined text options.
@@ -211,8 +224,8 @@ Button.djsxType = DJSX.Button;
  * @see {@link StringSelectProps}
  * @see {@link https://discord.com/developers/docs/interactions/message-components#string-select-menu}
  */
-export const StringSelect: TypedDJSXComponent<StringSelectProps, DJSX.StringSelect> = (_props) => null;
-StringSelect.djsxType = DJSX.StringSelect;
+export const StringSelect: TypedDISJSXComponent<StringSelectProps, DISJSX.StringSelect> = (_props) => null;
+StringSelect.disjsxType = DISJSX.StringSelect;
 
 /**
  * Represents an option within a String Select Menu.
@@ -220,8 +233,8 @@ StringSelect.djsxType = DJSX.StringSelect;
  * @see {@link SelectOptionProps}
  * @see {@link https://discord.com/developers/docs/interactions/message-components#string-select-menu-select-option-structure}
  */
-export const SelectOption: TypedDJSXComponent<SelectOptionProps, DJSX.SelectOption> = (_props) => null;
-SelectOption.djsxType = DJSX.SelectOption;
+export const SelectOption: TypedDISJSXComponent<SelectOptionProps, DISJSX.SelectOption> = (_props) => null;
+SelectOption.disjsxType = DISJSX.SelectOption;
 
 /**
  * Represents a User Select Menu, allowing users to select one or more users from the server.
@@ -229,8 +242,8 @@ SelectOption.djsxType = DJSX.SelectOption;
  * @see {@link UserSelectProps}
  * @see {@link https://discord.com/developers/docs/interactions/message-components#user-select-menu}
  */
-export const UserSelect: TypedDJSXComponent<UserSelectProps, DJSX.UserSelect> = (_props) => null;
-UserSelect.djsxType = DJSX.UserSelect;
+export const UserSelect: TypedDISJSXComponent<UserSelectProps, DISJSX.UserSelect> = (_props) => null;
+UserSelect.disjsxType = DISJSX.UserSelect;
 
 /**
  * Represents a Role Select Menu, allowing users to select one or more roles from the server.
@@ -238,8 +251,8 @@ UserSelect.djsxType = DJSX.UserSelect;
  * @see {@link RoleSelectProps}
  * @see {@link https://discord.com/developers/docs/interactions/message-components#role-select-menu}
  */
-export const RoleSelect: TypedDJSXComponent<RoleSelectProps, DJSX.RoleSelect> = (_props) => null;
-RoleSelect.djsxType = DJSX.RoleSelect;
+export const RoleSelect: TypedDISJSXComponent<RoleSelectProps, DISJSX.RoleSelect> = (_props) => null;
+RoleSelect.disjsxType = DISJSX.RoleSelect;
 
 /**
  * Represents a Mentionable Select Menu, allowing users to select users or roles from the server.
@@ -247,8 +260,8 @@ RoleSelect.djsxType = DJSX.RoleSelect;
  * @see {@link MentionableSelectProps}
  * @see {@link https://discord.com/developers/docs/interactions/message-components#mentionable-select-menu}
  */
-export const MentionableSelect: TypedDJSXComponent<MentionableSelectProps, DJSX.MentionableSelect> = (_props) => null;
-MentionableSelect.djsxType = DJSX.MentionableSelect;
+export const MentionableSelect: TypedDISJSXComponent<MentionableSelectProps, DISJSX.MentionableSelect> = (_props) => null;
+MentionableSelect.disjsxType = DISJSX.MentionableSelect;
 
 /**
  * Represents a Channel Select Menu, allowing users to select one or more channels from the server.
@@ -257,8 +270,19 @@ MentionableSelect.djsxType = DJSX.MentionableSelect;
  * @see {@link ChannelSelectProps}
  * @see {@link https://discord.com/developers/docs/interactions/message-components#channel-select-menu}
  */
-export const ChannelSelect: TypedDJSXComponent<ChannelSelectProps, DJSX.ChannelSelect> = (_props) => null;
-ChannelSelect.djsxType = DJSX.ChannelSelect;
+export const ChannelSelect: TypedDISJSXComponent<ChannelSelectProps, DISJSX.ChannelSelect> = (_props) => null;
+ChannelSelect.disjsxType = DISJSX.ChannelSelect;
+
+/**
+ * Represents a Text Input component for modals.
+ * Allows users to enter free-form text responses in single-line or multi-line formats.
+ * Must be placed within an Action Row in a modal.
+ * @see {@link TextInputProps}
+ * @see {@link TextInputStyle}
+ * @see {@link https://discord.com/developers/docs/interactions/message-components#text-input}
+ */
+export const TextInput: TypedDISJSXComponent<TextInputProps, DISJSX.TextInput> = (_props) => null;
+TextInput.disjsxType = DISJSX.TextInput;
 
 /* Section */
 
@@ -269,8 +293,8 @@ ChannelSelect.djsxType = DJSX.ChannelSelect;
  * @see {@link SectionProps}
  * @see {@link https://discord.com/developers/docs/interactions/message-components#section}
  */
-export const Section: TypedDJSXComponent<SectionProps, DJSX.Section> = (_props) => null;
-Section.djsxType = DJSX.Section;
+export const Section: TypedDISJSXComponent<SectionProps, DISJSX.Section> = (_props) => null;
+Section.disjsxType = DISJSX.Section;
 
 /**
  * Represents a Text Display component for V2 messages.
@@ -279,8 +303,8 @@ Section.djsxType = DJSX.Section;
  * @see {@link TextDisplayProps}
  * @see {@link https://discord.com/developers/docs/interactions/message-components#text-display}
  */
-export const TextDisplay: TypedDJSXComponent<TextDisplayProps, DJSX.TextDisplay> = (_props) => null;
-TextDisplay.djsxType = DJSX.TextDisplay;
+export const TextDisplay: TypedDISJSXComponent<TextDisplayProps, DISJSX.TextDisplay> = (_props) => null;
+TextDisplay.disjsxType = DISJSX.TextDisplay;
 
 /**
  * Represents a Thumbnail component for V2 messages.
@@ -289,8 +313,8 @@ TextDisplay.djsxType = DJSX.TextDisplay;
  * @see {@link ThumbnailProps}
  * @see {@link https://discord.com/developers/docs/interactions/message-components#thumbnail}
  */
-export const Thumbnail: TypedDJSXComponent<ThumbnailProps, DJSX.Thumbnail> = (_props) => null;
-Thumbnail.djsxType = DJSX.Thumbnail;
+export const Thumbnail: TypedDISJSXComponent<ThumbnailProps, DISJSX.Thumbnail> = (_props) => null;
+Thumbnail.disjsxType = DISJSX.Thumbnail;
 
 /**
  * Represents a Media Gallery component for V2 messages.
@@ -299,8 +323,8 @@ Thumbnail.djsxType = DJSX.Thumbnail;
  * @see {@link MediaGalleryProps}
  * @see {@link https://discord.com/developers/docs/interactions/message-components#media-gallery}
  */
-export const MediaGallery: TypedDJSXComponent<MediaGalleryProps, DJSX.MediaGallery> = (_props) => null;
-MediaGallery.djsxType = DJSX.MediaGallery;
+export const MediaGallery: TypedDISJSXComponent<MediaGalleryProps, DISJSX.MediaGallery> = (_props) => null;
+MediaGallery.disjsxType = DISJSX.MediaGallery;
 
 /**
  * Represents a single item within a Media Gallery.
@@ -308,8 +332,8 @@ MediaGallery.djsxType = DJSX.MediaGallery;
  * @see {@link MediaGalleryItemProps}
  * @see {@link https://discord.com/developers/docs/interactions/message-components#media-gallery-item-structure}
  */
-export const MediaGalleryItem: TypedDJSXComponent<MediaGalleryItemProps, DJSX.MediaGalleryItem> = (_props) => null;
-MediaGalleryItem.djsxType = DJSX.MediaGalleryItem;
+export const MediaGalleryItem: TypedDISJSXComponent<MediaGalleryItemProps, DISJSX.MediaGalleryItem> = (_props) => null;
+MediaGalleryItem.disjsxType = DISJSX.MediaGalleryItem;
 
 /**
  * Represents a File component for V2 messages.
@@ -318,8 +342,8 @@ MediaGalleryItem.djsxType = DJSX.MediaGalleryItem;
  * @see {@link FileProps}
  * @see {@link https://discord.com/developers/docs/interactions/message-components#file}
  */
-export const File: TypedDJSXComponent<FileProps, DJSX.File> = (_props) => null;
-File.djsxType = DJSX.File;
+export const File: TypedDISJSXComponent<FileProps, DISJSX.File> = (_props) => null;
+File.disjsxType = DISJSX.File;
 
 /**
  * Represents a Separator component for V2 messages.
@@ -328,8 +352,8 @@ File.djsxType = DJSX.File;
  * @see {@link SeparatorProps}
  * @see {@link https://discord.com/developers/docs/interactions/message-components#separator}
  */
-export const Separator: TypedDJSXComponent<SeparatorProps, DJSX.Separator> = (_props) => null;
-Separator.djsxType = DJSX.Separator;
+export const Separator: TypedDISJSXComponent<SeparatorProps, DISJSX.Separator> = (_props) => null;
+Separator.disjsxType = DISJSX.Separator;
 
 /**
  * Represents a Container component for V2 messages.
@@ -338,5 +362,5 @@ Separator.djsxType = DJSX.Separator;
  * @see {@link ContainerProps}
  * @see {@link https://discord.com/developers/docs/interactions/message-components#container}
  */
-export const Container: TypedDJSXComponent<ContainerProps, DJSX.Container> = (_props) => null;
-Container.djsxType = DJSX.Container;
+export const Container: TypedDISJSXComponent<ContainerProps, DISJSX.Container> = (_props) => null;
+Container.disjsxType = DISJSX.Container;
