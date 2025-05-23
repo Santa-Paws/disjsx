@@ -42,18 +42,6 @@ export default tseslint.config(globalIgnores(["dist/**/*", "dev-test/**/*", "**/
 			},
 		],
 		"no-return-await": "error",
-		"@typescript-eslint/naming-convention": [
-			"error",
-			{
-				selector: "variable",
-				types: ["function"],
-				format: ["camelCase", "PascalCase"],
-			},
-			{
-				selector: "variable",
-				format: ["camelCase"],
-			},
-		],
 		"@typescript-eslint/no-unsafe-declaration-merging": "off", // who actually uses this rule???
 		"@typescript-eslint/no-unsafe-function-type": "off", // this is fine imo
 		"require-braces/require-braces": "error",

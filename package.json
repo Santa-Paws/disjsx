@@ -1,6 +1,6 @@
 {
 	"name": "disjsx",
-	"version": "0.1.1",
+	"version": "0.2.0",
 	"main": "./dist/node/index.js",
 	"module": "./dist/node/index.js",
 	"devDependencies": {
@@ -12,14 +12,14 @@
 		"eslint-plugin-react-refresh": "^0.4.19",
 		"globals": "^16.0.0",
 		"prettier": "^3.5.3",
-		"typescript-eslint": "^8.29.1",
-		"@types/react": "^19.0.0"
+		"typescript-eslint": "^8.29.1"
 	},
 	"peerDependencies": {
 		"typescript": "^5"
 	},
 	"dependencies": {
-		"react": "^19.0.0"
+		"react": "^19.0.0",
+		"@types/react": "^19.0.0"
 	},
 	"exports": {
 		".": {
