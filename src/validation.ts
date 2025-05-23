@@ -514,9 +514,13 @@ export class ComponentValidator {
 			if (childType === DISJSX.Button) {
 				buttonCount++;
 			} else if (
-				[DISJSX.StringSelect, DISJSX.UserSelect, DISJSX.RoleSelect, DISJSX.MentionableSelect, DISJSX.ChannelSelect].includes(
-					childType,
-				)
+				[
+					DISJSX.StringSelect,
+					DISJSX.UserSelect,
+					DISJSX.RoleSelect,
+					DISJSX.MentionableSelect,
+					DISJSX.ChannelSelect,
+				].includes(childType)
 			) {
 				selectCount++;
 			}

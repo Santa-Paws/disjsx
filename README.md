@@ -221,9 +221,9 @@ const unvalidatedResult = renderDiscordMessage(message, { validate: false });
 
 // Enable validation with error throwing
 try {
-	const result = renderDiscordMessage(message, { 
-		validate: true, 
-		throwOnValidationError: true 
+	const result = renderDiscordMessage(message, {
+		validate: true,
+		throwOnValidationError: true,
 	});
 } catch (error) {
 	console.error("Validation failed:", error.message);
@@ -272,6 +272,7 @@ interface ValidationError {
 Common validation rules include:
 
 - **Character Limits:**
+
   - Message content: 2000 characters
   - Embed title: 256 characters
   - Embed description: 4096 characters
@@ -279,6 +280,7 @@ Common validation rules include:
   - Custom ID: 100 characters
 
 - **Component Limits:**
+
   - V2 messages: 40 total components
   - Legacy messages: 5 Action Rows maximum
   - Action Rows: 5 buttons OR 1 select menu

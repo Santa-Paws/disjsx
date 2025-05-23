@@ -260,7 +260,8 @@ RoleSelect.disjsxType = DISJSX.RoleSelect;
  * @see {@link MentionableSelectProps}
  * @see {@link https://discord.com/developers/docs/interactions/message-components#mentionable-select-menu}
  */
-export const MentionableSelect: TypedDISJSXComponent<MentionableSelectProps, DISJSX.MentionableSelect> = (_props) => null;
+export const MentionableSelect: TypedDISJSXComponent<MentionableSelectProps, DISJSX.MentionableSelect> = (_props) =>
+	null;
 MentionableSelect.disjsxType = DISJSX.MentionableSelect;
 
 /**
