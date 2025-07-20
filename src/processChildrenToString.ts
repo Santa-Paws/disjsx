@@ -42,7 +42,7 @@ export const processChildrenToString = (childrenNodes: ReactNode, listIndentPref
 		return "";
 	}
 	const nodes = Array.isArray(childrenNodes) ? childrenNodes : [childrenNodes];
-	let resultString = "";
+	const resultParts: string[] = [];
 	let previousNodeWasBlock = true;
 
 	for (const rawCurrentNode of nodes) {
@@ -51,7 +51,7 @@ export const processChildrenToString = (childrenNodes: ReactNode, listIndentPref
 		}
 
 		if (typeof rawCurrentNode === "string" || typeof rawCurrentNode === "number") {
-			resultString += String(rawCurrentNode);
+			resultParts.push(String(rawCurrentNode));
 			previousNodeWasBlock = false;
 			continue;
 		}
@@ -82,8 +82,11 @@ export const processChildrenToString = (childrenNodes: ReactNode, listIndentPref
 		const currentElementTypeStr = typeof type === "string" ? type : "";
 		const isCurrentNodeHtmlBlock = blockElementTypes.has(currentElementTypeStr);
 
-		if (isCurrentNodeHtmlBlock && !previousNodeWasBlock && resultString.length > 0 && !resultString.endsWith("\n")) {
-			resultString += "\n";
+		if (isCurrentNodeHtmlBlock && !previousNodeWasBlock && resultParts.length > 0) {
+			const lastPart = resultParts[resultParts.length - 1];
+			if (lastPart && !lastPart.endsWith("\n")) {
+				resultParts.push("\n");
+			}
 		}
 
 		let elementContent = "";
@@ -219,10 +222,13 @@ export const processChildrenToString = (childrenNodes: ReactNode, listIndentPref
 		} else {
 			elementContent = processChildrenToString(props.children, listIndentPrefix);
 		}
-		resultString += elementContent;
+		if (elementContent) {
+			resultParts.push(elementContent);
+		}
 		previousNodeWasBlock =
 			isCurrentNodeHtmlBlock || (elementContent.endsWith("\n") && elementContent.trim().length > 0);
 	}
 
+	const resultString = resultParts.join("");
 	return resultString.replace(/\n\n\n+/g, "\n\n").trim();
 };

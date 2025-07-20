@@ -52,7 +52,8 @@ export const processNode = (node: ReactNode): unknown | null => {
  * @returns The DISJSX type, or undefined if not a DISJSX component.
  */
 export const getDISJSXType = (node: ReactNode, loop: number = 0): DISJSX | undefined => {
-	if (loop > 10) {
+	if (loop > 50) {
+		console.warn("getDISJSXType: Maximum recursion depth reached, potential infinite loop detected");
 		return undefined;
 	}
 
@@ -68,8 +69,8 @@ export const getDISJSXType = (node: ReactNode, loop: number = 0): DISJSX | undef
 		}
 
 		// It's a regular functional component, try to render and recurse
-		// @ts-expect-error - TODO: fix this
-		const renderedOutput = type(props);
+		// Safely call the functional component with proper typing
+		const renderedOutput = (type as (props: any) => ReactNode)(props);
 
 		return getDISJSXType(renderedOutput, loop + 1);
 	}
@@ -87,24 +88,27 @@ export const getDISJSXType = (node: ReactNode, loop: number = 0): DISJSX | undef
  * @throws TypeError if a functional component meant for unwrapping returns a non-element.
  */
 export const getProcessedElement = (element: ReactElement, loop: number = 0): ReactElement => {
-	if (loop > 10) {
+	if (loop > 50) {
+		console.warn("getProcessedElement: Maximum recursion depth reached, potential infinite loop detected");
 		return element;
 	}
 
 	if (typeof element.type === "function" && !("disjsxType" in element.type)) {
-		// @ts-expect-error - TODO: fix this
-		const renderedOutput = element.type(element.props);
+		// Safely call the functional component with proper typing
+		const renderedOutput = (element.type as (props: any) => ReactNode)(element.props);
 
 		if (isValidElement(renderedOutput)) {
 			return getProcessedElement(renderedOutput, loop + 1);
 		}
 
-		console.error(
-			"Error in getProcessedElement: A functional component without 'disjsxType' returned a non-element or null. Element:",
-			element,
-			"Rendered output:",
-			renderedOutput,
-		);
+		if (process.env.NODE_ENV !== "production") {
+			console.error(
+				"Error in getProcessedElement: A functional component without 'disjsxType' returned a non-element or null. Element:",
+				element,
+				"Rendered output:",
+				renderedOutput,
+			);
+		}
 
 		throw new TypeError("DISJSX: Functional component wrapper did not return a valid React element.");
 	}

@@ -1129,6 +1129,58 @@ export const validateComponent = (
 };
 
 /**
+ * Sanitizes a string input by removing/escaping potentially dangerous characters.
+ * @param input The string to sanitize
+ * @param maxLength Optional maximum length to truncate to
+ * @returns Sanitized string
+ */
+export const sanitizeString = (input: string, maxLength?: number): string => {
+	if (!input) return "";
+	
+	// Remove null bytes and control characters except newline and tab
+	let sanitized = input.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "");
+	
+	// Trim whitespace
+	sanitized = sanitized.trim();
+	
+	// Truncate if maxLength specified
+	if (maxLength && sanitized.length > maxLength) {
+		sanitized = sanitized.substring(0, maxLength);
+	}
+	
+	return sanitized;
+};
+
+/**
+ * Validates that a customId contains only safe characters.
+ * @param customId The custom ID to validate
+ * @returns Array of validation errors if unsafe characters found
+ */
+const validateCustomIdSafety = (customId: string): ValidationError[] => {
+	const errors: ValidationError[] = [];
+	
+	// Check for potentially dangerous patterns
+	const dangerousPatterns = [
+		/[<>]/g, // HTML/XML injection
+		/javascript:/i, // JavaScript injection
+		/data:/i, // Data URL injection
+		/vbscript:/i, // VBScript injection
+	];
+	
+	for (const pattern of dangerousPatterns) {
+		if (pattern.test(customId)) {
+			errors.push({
+				type: "error",
+				message: `Custom ID contains potentially unsafe characters: "${customId}"`,
+			});
+			break;
+		}
+	}
+	
+	return errors;
+};
+
+/**
  * Validates that all customId properties within a component tree are unique.
  * @param element The root React element to check for duplicate customIds
  * @returns Array of validation errors for any duplicate customIds found
@@ -1146,16 +1198,22 @@ export const validateUniqueCustomIds = (element: ReactElement): ValidationError[
 		const disjsxType = getDISJSXType(processedNode);
 		const props = processedNode.props;
 
-		if ("customId" in props) {
-			if (customIds.has(props.customId)) {
+		if ("customId" in props && props.customId) {
+			const sanitizedCustomId = sanitizeString(props.customId, VALIDATION_LIMITS.CUSTOM_ID_MAX_LENGTH);
+			
+			// Validate for safety
+			const safetyErrors = validateCustomIdSafety(sanitizedCustomId);
+			errors.push(...safetyErrors);
+			
+			if (customIds.has(sanitizedCustomId)) {
 				errors.push({
 					type: "error",
-					message: `Duplicate customId "${props.customId}" found. Custom IDs must be unique within a message.`,
+					message: `Duplicate customId "${sanitizedCustomId}" found. Custom IDs must be unique within a message.`,
 					component: disjsxType,
 					path: [...path],
 				});
 			} else {
-				customIds.add(props.customId);
+				customIds.add(sanitizedCustomId);
 			}
 		}
 

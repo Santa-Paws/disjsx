@@ -54,10 +54,12 @@ export const renderDiscordMessage = (
 	const processedMessageElement = getProcessedElement(messageElement);
 
 	if (!processedMessageElement || getDISJSXType(processedMessageElement) !== DISJSX.Message) {
-		console.error("Received:", messageElement);
-		console.error("Processed:", processedMessageElement);
-		console.error("DISJSX Type:", getDISJSXType(processedMessageElement));
-		console.error("renderDiscordMessage expects a root <Message> element or a component that renders to one.");
+		if (process.env.NODE_ENV !== "production") {
+			console.error("Received:", messageElement);
+			console.error("Processed:", processedMessageElement);
+			console.error("DISJSX Type:", getDISJSXType(processedMessageElement));
+			console.error("renderDiscordMessage expects a root <Message> element or a component that renders to one.");
+		}
 
 		return null;
 	}
@@ -80,17 +82,19 @@ export const renderDiscordMessage = (
 		const allWarnings = validationResult.warnings;
 
 		if (allErrors.length > 0) {
-			console.error("DisJSX Validation Errors:");
-			allErrors.forEach((error) => {
-				console.error(`  - ${error.message}${error.path ? ` (at ${error.path.join(" > ")})` : ""}`);
-			});
+			if (process.env.NODE_ENV !== "production") {
+				console.error("DisJSX Validation Errors:");
+				allErrors.forEach((error) => {
+					console.error(`  - ${error.message}${error.path ? ` (at ${error.path.join(" > ")})` : ""}`);
+				});
+			}
 
 			if (throwOnValidationError) {
-				throw new Error(`DisJSX validation failed with ${allErrors.length} error(s). See console for details.`);
+				throw new Error(`DisJSX validation failed with ${allErrors.length} error(s).${process.env.NODE_ENV !== "production" ? " See console for details." : ""}`);
 			}
 		}
 
-		if (allWarnings.length > 0) {
+		if (allWarnings.length > 0 && process.env.NODE_ENV !== "production") {
 			console.warn("DisJSX Validation Warnings:");
 			allWarnings.forEach((warning) => {
 				console.warn(`  - ${warning.message}${warning.path ? ` (at ${warning.path.join(" > ")})` : ""}`);
@@ -198,10 +202,12 @@ export const renderDiscordModal = (
 	const processedModalElement = getProcessedElement(modalElement);
 
 	if (!processedModalElement || getDISJSXType(processedModalElement) !== DISJSX.Modal) {
-		console.error("Received:", modalElement);
-		console.error("Processed:", processedModalElement);
-		console.error("DISJSX Type:", getDISJSXType(processedModalElement));
-		console.error("renderDiscordModal expects a root <Modal> element or a component that renders to one.");
+		if (process.env.NODE_ENV !== "production") {
+			console.error("Received:", modalElement);
+			console.error("Processed:", processedModalElement);
+			console.error("DISJSX Type:", getDISJSXType(processedModalElement));
+			console.error("renderDiscordModal expects a root <Modal> element or a component that renders to one.");
+		}
 
 		return null;
 	}
@@ -221,17 +227,19 @@ export const renderDiscordModal = (
 		const allWarnings = validationResult.warnings;
 
 		if (allErrors.length > 0) {
-			console.error("DisJSX Modal Validation Errors:");
-			allErrors.forEach((error) => {
-				console.error(`  - ${error.message}${error.path ? ` (at ${error.path.join(" > ")})` : ""}`);
-			});
+			if (process.env.NODE_ENV !== "production") {
+				console.error("DisJSX Modal Validation Errors:");
+				allErrors.forEach((error) => {
+					console.error(`  - ${error.message}${error.path ? ` (at ${error.path.join(" > ")})` : ""}`);
+				});
+			}
 
 			if (throwOnValidationError) {
-				throw new Error(`DisJSX modal validation failed with ${allErrors.length} error(s). See console for details.`);
+				throw new Error(`DisJSX modal validation failed with ${allErrors.length} error(s).${process.env.NODE_ENV !== "production" ? " See console for details." : ""}`);
 			}
 		}
 
-		if (allWarnings.length > 0) {
+		if (allWarnings.length > 0 && process.env.NODE_ENV !== "production") {
 			console.warn("DisJSX Modal Validation Warnings:");
 			allWarnings.forEach((warning) => {
 				console.warn(`  - ${warning.message}${warning.path ? ` (at ${warning.path.join(" > ")})` : ""}`);
