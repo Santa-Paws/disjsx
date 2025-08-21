@@ -11,7 +11,12 @@ export const ContainerNode: NodeProcessor<ContainerPayload, ContainerProps> = {
 			const processedChild = processChildNode(child);
 
 			if (processedChild !== null) {
-				components.push(processedChild as AnyComponentPayload);
+				// Handle arrays returned from Fragments
+				if (Array.isArray(processedChild)) {
+					components.push(...(processedChild as AnyComponentPayload[]));
+				} else {
+					components.push(processedChild as AnyComponentPayload);
+				}
 			}
 		}
 

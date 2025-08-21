@@ -23,15 +23,19 @@ export const SectionNode: NodeProcessor<SectionPayload, SectionProps> = {
 			if (!processedChild) {
 				continue;
 			}
-			const typedProcessedChild = processedChild as AnyComponentPayload;
 
-			if (typedProcessedChild.type === ComponentType.TextDisplay) {
-				textDisplays.push(typedProcessedChild as TextDisplayPayload);
-			} else if (
-				typedProcessedChild.type === ComponentType.Thumbnail ||
-				typedProcessedChild.type === ComponentType.Button
-			) {
-				accessory = typedProcessedChild as ThumbnailPayload | ButtonPayload;
+			// Handle arrays returned from Fragments
+			const childrenToProcess = Array.isArray(processedChild) ? processedChild : [processedChild];
+
+			for (const typedProcessedChild of childrenToProcess as AnyComponentPayload[]) {
+				if (typedProcessedChild.type === ComponentType.TextDisplay) {
+					textDisplays.push(typedProcessedChild as TextDisplayPayload);
+				} else if (
+					typedProcessedChild.type === ComponentType.Thumbnail ||
+					typedProcessedChild.type === ComponentType.Button
+				) {
+					accessory = typedProcessedChild as ThumbnailPayload | ButtonPayload;
+				}
 			}
 		}
 

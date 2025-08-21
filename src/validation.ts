@@ -27,7 +27,7 @@ import {
 	type EmbedFieldTitleProps,
 } from "./types";
 import type { ReactElement, ReactNode } from "react";
-import { Children, isValidElement } from "react";
+import { Children, isValidElement, Fragment } from "react";
 import { getDISJSXType, getProcessedElement } from "./utils";
 
 /**
@@ -57,6 +57,28 @@ export interface ValidationResult {
 	/** Array of validation warnings that should be addressed */
 	warnings: ValidationError[];
 }
+
+/**
+ * Helper function to expand React Fragments into their children.
+ * This allows the validation system to handle <> and </> transparently.
+ * @param children Array of React nodes that may contain Fragments
+ * @returns Flattened array with Fragment children expanded
+ */
+const expandFragments = (children: ReactNode[]): ReactNode[] => {
+	const expanded: ReactNode[] = [];
+	
+	for (const child of children) {
+		if (isValidElement(child) && child.type === Fragment) {
+			const fragmentChildren = Children.toArray((child.props as { children: ReactNode }).children);
+
+			expanded.push(...expandFragments(fragmentChildren));
+		} else {
+			expanded.push(child);
+		}
+	}
+	
+	return expanded;
+};
 
 /**
  * Component placement rules based on Discord documentation.
@@ -284,7 +306,9 @@ export class ComponentValidator {
 	 * @param children The modal's child components
 	 */
 	private validateModalComponents(children: ReactNodeType<ModalProps>[]) {
-		for (const child of children) {
+		const expandedChildren = expandFragments(children as ReactNode[]);
+		
+		for (const child of expandedChildren) {
 			if (!isValidElement(child)) {
 				continue;
 			}
@@ -338,8 +362,9 @@ export class ComponentValidator {
 	 */
 	private validateV2MessageComponents(children: ReactNodeType<MessageProps>[]) {
 		let contentLength = 0;
+		const expandedChildren = expandFragments(children as ReactNode[]);
 
-		for (const child of children) {
+		for (const child of expandedChildren) {
 			if (!isValidElement(child)) {
 				continue;
 			}
@@ -380,8 +405,9 @@ export class ComponentValidator {
 	private validateLegacyMessageComponents(children: ReactNodeType<MessageProps>[]) {
 		let actionRowCount = 0;
 		let contentLength = 0;
+		const expandedChildren = expandFragments(children as ReactNode[]);
 
-		for (const child of children) {
+		for (const child of expandedChildren) {
 			if (!isValidElement(child)) {
 				continue;
 			}
@@ -485,8 +511,9 @@ export class ComponentValidator {
 	private validateActionRow(element: ReactElement<ActionRowProps>) {
 		this.path.push("ActionRow");
 		const children = Children.toArray(element.props.children);
+		const expandedChildren = expandFragments(children);
 
-		if (children.length === 0) {
+		if (expandedChildren.length === 0) {
 			this.addError("Action Row cannot be empty");
 			this.path.pop();
 			return;
@@ -496,7 +523,7 @@ export class ComponentValidator {
 		let buttonCount = 0;
 		let selectCount = 0;
 
-		for (const child of children) {
+		for (const child of expandedChildren) {
 			if (!isValidElement(child)) {
 				continue;
 			}
@@ -709,11 +736,12 @@ export class ComponentValidator {
 	private validateSection(element: ReactElement<SectionProps>) {
 		this.path.push("Section");
 		const children = Children.toArray(element.props.children);
+		const expandedChildren = expandFragments(children);
 
 		const textComponents: ReactElement[] = [];
 		let accessoryComponent: ReactElement | null = null;
 
-		for (const child of children) {
+		for (const child of expandedChildren) {
 			if (!isValidElement(child)) {
 				continue;
 			}
@@ -762,8 +790,9 @@ export class ComponentValidator {
 	private validateContainer(element: ReactElement<ContainerProps>) {
 		this.path.push("Container");
 		const children = Children.toArray(element.props.children);
+		const expandedChildren = expandFragments(children);
 
-		for (const child of children) {
+		for (const child of expandedChildren) {
 			if (!isValidElement(child)) {
 				continue;
 			}

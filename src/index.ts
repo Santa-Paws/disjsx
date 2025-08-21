@@ -1,4 +1,4 @@
-import { type ReactNode, type ReactElement, Children, isValidElement } from "react";
+import { type ReactNode, type ReactElement, Children, isValidElement, Fragment } from "react";
 import {
 	type MessageProps,
 	type ModalProps,
@@ -108,10 +108,23 @@ export const renderDiscordMessage = (
 		const v2Components: AnyComponentPayload[] = [];
 
 		for (const child of childrenArray) {
-			const processedNode = processNode(child);
+			if (isValidElement(child) && child.type === Fragment) {
+				// Handle React Fragments by processing their children
+				const fragmentChildren = Children.toArray((child.props as { children: ReactNode }).children);
 
-			if (processedNode !== null) {
-				v2Components.push(processedNode as AnyComponentPayload);
+				for (const fragmentChild of fragmentChildren) {
+					const processedNode = processNode(fragmentChild);
+
+					if (processedNode !== null) {
+						v2Components.push(processedNode as AnyComponentPayload);
+					}
+				}
+			} else {
+				const processedNode = processNode(child);
+
+				if (processedNode !== null) {
+					v2Components.push(processedNode as AnyComponentPayload);
+				}
 			}
 		}
 		const v2Payload: V2MessagePayload = {
@@ -141,6 +154,44 @@ export const renderDiscordMessage = (
 				!legacyPayload.content // Only use first string child as content if no <Content> used
 			) {
 				legacyPayload.content = (legacyPayload.content || "") + rawChildNode;
+			}
+			continue;
+		}
+
+		// Handle React Fragments by processing their children
+		if (rawChildNode.type === Fragment) {
+			const fragmentChildren = Children.toArray((rawChildNode.props as { children: ReactNode }).children);
+
+			for (const fragmentChild of fragmentChildren) {
+				if (!isValidElement(fragmentChild)) {
+					if (
+						typeof fragmentChild === "string" &&
+						!legacyPayload.content
+					) {
+						legacyPayload.content = (legacyPayload.content || "") + fragmentChild;
+					}
+					continue;
+				}
+
+				const childNode = getProcessedElement(fragmentChild);
+				const childDISJSXType = getDISJSXType(childNode);
+
+				if (childDISJSXType === DISJSX.Content) {
+					legacyPayload.content =
+						(legacyPayload.content || "") + processChildrenToString((childNode.props as { children: ReactNode }).children);
+				} else if (childDISJSXType === DISJSX.Embed) {
+					const embed = processNode(childNode) as EmbedPayload | null;
+
+					if (embed) {
+						legacyPayload.embeds?.push(embed);
+					}
+				} else if (childDISJSXType === DISJSX.ActionRow) {
+					const actionRow = processNode(childNode) as ActionRowPayload | null;
+
+					if (actionRow) {
+						legacyPayload.components?.push(actionRow);
+					}
+				}
 			}
 			continue;
 		}

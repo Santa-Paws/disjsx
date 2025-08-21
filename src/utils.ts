@@ -1,7 +1,7 @@
 import { nodeProcessors } from "@disjsx/nodes/index.ts";
 import { processChildrenToString } from "@disjsx/processChildrenToString.ts";
 import type { DISJSX, TypedDISJSXComponent } from "./disjsxTypes";
-import { isValidElement, type ReactNode, type ReactElement } from "react";
+import { isValidElement, type ReactNode, type ReactElement, Fragment, Children } from "react";
 
 /**
  * Transforms a single React DISJSX component node into its corresponding JSON payload object.
@@ -23,6 +23,17 @@ export const processNode = (node: ReactNode): unknown | null => {
 	}
 
 	const element = getProcessedElement(node);
+	
+	// Handle React Fragments by processing their children and returning them as an array
+	if (element.type === Fragment) {
+		const fragmentChildren = Children.toArray((element.props as { children: ReactNode }).children);
+		const processedChildren = fragmentChildren
+			.map(child => processNode(child))
+			.filter(result => result !== null);
+		
+		return processedChildren;
+	}
+
 	const componentDISJSXType = getDISJSXType(element);
 
 	if (!componentDISJSXType) {
@@ -61,6 +72,11 @@ export const getDISJSXType = (node: ReactNode, loop: number = 0): DISJSX | undef
 	}
 
 	const { type, props } = node;
+
+	// Handle React Fragments - they should be treated as transparent
+	if (type === Fragment) {
+		return undefined;
+	}
 
 	if (typeof type === "function") {
 		if ("disjsxType" in type) {
