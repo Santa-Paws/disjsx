@@ -31,6 +31,8 @@ import {
 	type FileProps,
 	type SeparatorProps,
 	type ContainerProps,
+	type LabelProps,
+	type FileUploadProps,
 } from "./types";
 
 /**
@@ -70,6 +72,8 @@ export enum DISJSX {
 	File = "disjsx:File",
 	Separator = "disjsx:Separator",
 	Container = "disjsx:Container",
+	Label = "disjsx:Label",
+	FileUpload = "disjsx:FileUpload",
 }
 
 export interface TypedDISJSXComponent<P, T extends DISJSX> extends React.FC<P> {
@@ -88,7 +92,7 @@ Message.disjsxType = DISJSX.Message;
 
 /**
  * Represents a Discord modal dialog for collecting user input.
- * Modals can only contain Action Rows with Text Input components.
+ * Modals can contain Label (recommended), TextDisplay, or ActionRow (deprecated for Text Inputs) components.
  * @see {@link ModalProps}
  * @see {@link https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-modal}
  */
@@ -365,3 +369,21 @@ Separator.disjsxType = DISJSX.Separator;
  */
 export const Container: TypedDISJSXComponent<ContainerProps, DISJSX.Container> = (_props) => null;
 Container.disjsxType = DISJSX.Container;
+
+/**
+ * Represents a Label component for modals.
+ * Wraps modal components with text as a label and optional description.
+ * @see {@link LabelProps}
+ * @see {@link https://discord.com/developers/docs/interactions/message-components#label}
+ */
+export const Label: TypedDISJSXComponent<LabelProps, DISJSX.Label> = (_props) => null;
+Label.disjsxType = DISJSX.Label;
+
+/**
+ * Represents a FileUpload component for modals.
+ * Allows users to upload files in modals.
+ * @see {@link FileUploadProps}
+ * @see {@link https://discord.com/developers/docs/interactions/message-components#file-upload}
+ */
+export const FileUpload: TypedDISJSXComponent<FileUploadProps, DISJSX.FileUpload> = (_props) => null;
+FileUpload.disjsxType = DISJSX.FileUpload;

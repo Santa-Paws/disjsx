@@ -15,6 +15,8 @@ import { ThumbnailNode } from "./ThumbnailNode";
 import { FileNode } from "./FileNode";
 import { SectionNode } from "./SectionNode";
 import { MediaGalleryNode } from "./MediaGalleryNode";
+import { LabelNode } from "./LabelNode";
+import { FileUploadNode } from "./FileUploadNode";
 import { type NodeProcessor } from "./types";
 import type { AnyComponentPayload, EmbedPayload } from "@disjsx/types.ts";
 
@@ -40,6 +42,8 @@ export const nodeProcessors = {
 	[DISJSX.Section]: SectionNode,
 	[DISJSX.MediaGallery]: MediaGalleryNode,
 	[DISJSX.File]: FileNode,
+	[DISJSX.Label]: LabelNode,
+	[DISJSX.FileUpload]: FileUploadNode,
 } satisfies Partial<Record<DISJSX, NodeProcessor<AnyComponentPayload | EmbedPayload, never>>>;
 
 export * from "./types";
@@ -59,3 +63,5 @@ export * from "./ThumbnailNode";
 export * from "./FileNode";
 export * from "./SectionNode";
 export * from "./MediaGalleryNode";
+export * from "./LabelNode";
+export * from "./FileUploadNode";

@@ -224,5 +224,5 @@ export const processChildrenToString = (childrenNodes: ReactNode, listIndentPref
 			isCurrentNodeHtmlBlock || (elementContent.endsWith("\n") && elementContent.trim().length > 0);
 	}
 
-	return resultString.replace(/\n\n\n+/g, "\n\n").trim();
+	return resultString;
 };

@@ -1,36 +1,47 @@
-import { Modal, ActionRow, TextInput, TextInputStyle, renderDiscordModal } from "disjsx";
+import { Modal, Label, TextInput, TextInputStyle, renderDiscordModal } from "disjsx";
 
+/**
+ * Example: User Profile Modal (Updated to use Label components)
+ * 
+ * This demonstrates:
+ * - Label components replacing the deprecated ActionRow pattern
+ * - TextInput components with different styles
+ * - Mix of required and optional fields
+ * - Clean, modern modal structure
+ * 
+ * Note: ActionRow with TextInput is deprecated for modals. Use Label instead!
+ */
 const UserProfileModal = () => (
 	<Modal title="Edit Profile" customId="profile_modal">
-		<ActionRow>
+		<Label label="Username" description="Choose a display name for your profile">
 			<TextInput
 				customId="username"
-				label="Username"
 				style={TextInputStyle.Short}
 				placeholder="Enter your username"
 				maxLength={32}
 				required={true}
+				label="Username"
 			/>
-		</ActionRow>
-		<ActionRow>
+		</Label>
+		
+		<Label label="Bio" description="Tell the community about yourself">
 			<TextInput
 				customId="bio"
-				label="Bio"
 				style={TextInputStyle.Paragraph}
 				placeholder="Tell us about yourself..."
 				maxLength={1000}
 				required={false}
 			/>
-		</ActionRow>
-		<ActionRow>
+		</Label>
+		
+		<Label label="Email" description="Your contact email (kept private)">
 			<TextInput
 				customId="email"
-				label="Email"
 				style={TextInputStyle.Short}
 				placeholder="user@example.com"
 				required={true}
 			/>
-		</ActionRow>
+		</Label>
 	</Modal>
 );
 

@@ -231,7 +231,7 @@ export const renderDiscordMessage = (
  * Renders a DISJSX `<Modal>` element and its children into a Discord modal payload object.
  * This function is specifically for converting modal DISJSX trees into usable modal payloads.
  *
- * Modals can only contain Action Rows with Text Input components.
+ * Modals can contain Label (recommended), TextDisplay, or ActionRow (deprecated for Text Inputs) components.
  *
  * @param modalElement The root `<Modal>` React element or a component that renders to a Modal element.
  * @param options Optional configuration for validation and error handling.
@@ -295,13 +295,13 @@ export const renderDiscordModal = (
 	}
 
 	const childrenArray = Children.toArray(props.children);
-	const components: ActionRowPayload[] = [];
+	const components: AnyComponentPayload[] = [];
 
 	for (const child of childrenArray) {
 		const processedNode = processNode(child);
 
 		if (processedNode !== null) {
-			components.push(processedNode as ActionRowPayload);
+			components.push(processedNode as AnyComponentPayload);
 		}
 	}
 

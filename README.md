@@ -318,12 +318,17 @@ Represents a Discord message, the top-level container for all content. Supports 
 
 ### `<Modal>`
 
-Represents a Discord modal dialog for collecting user input. Modals are popup forms that can contain text input fields.
+Represents a Discord modal dialog for collecting user input. Modals are popup forms that can contain various input fields and components.
 
 - **Props (`ModalProps`):**
   - `title: string`: The title of the popup modal (max 45 characters).
   - `customId: string`: Developer-defined identifier for the modal (max 100 characters). This is sent back when the modal is submitted.
-  - `children: React.ReactNode`: Can only contain `<ActionRow>` components with `<TextInput>` components inside.
+  - `children: React.ReactNode`: Can contain:
+    - `<Label>` - Recommended wrapper for inputs with label and description
+    - `<TextDisplay>` - For informational text/instructions
+    - `<FileUpload>` - For file upload inputs
+    - `<ActionRow>` with `<TextInput>` - Deprecated, use `<Label>` instead
+- **Example:** See the [Modal Examples](#modal-examples) section below for comprehensive examples.
 
 ---
 
@@ -486,16 +491,43 @@ _Must be placed within an `<ActionRow>` or as a `<Section>` accessory (V2 only).
 
 ---
 
+### `<Label>` (Modal Layout Component)
+
+A wrapper component for modal inputs that provides a label and optional description. This is the recommended way to structure modal inputs.
+
+- **Props (`LabelProps`):**
+  - `label: string`: The label text (max 45 characters).
+  - `description?: string`: Optional description text for additional context (max 100 characters).
+  - `children: React.ReactNode`: The input component (`<TextInput>`, `<StringSelect>`, `<UserSelect>`, `<RoleSelect>`, `<MentionableSelect>`, `<ChannelSelect>`, or `<FileUpload>`).
+  - `id?: number`: Optional identifier for the component.
+
+---
+
+### `<FileUpload>` (Interactive Component - Modals Only)
+
+Allows users to upload files in modals.
+
+- **Props (`FileUploadProps`):**
+  - `customId: string`: Developer-defined identifier (max 100 characters). Sent back when the modal is submitted. Must be unique.
+  - `minValues?: number`: Minimum number of files that must be uploaded (0-10). Defaults to 1.
+  - `maxValues?: number`: Maximum number of files that can be uploaded (1-10). Defaults to 1.
+  - `required?: boolean`: Whether the file upload is required (defaults to `true`).
+  - `id?: number`: Optional identifier for the component.
+
+---
+
 ### `<TextInput>` (Interactive Component - Modals Only)
 
 Represents a text input field for collecting user input in modals. Text inputs come in two styles: short (single-line) and paragraph (multi-line).
+
+**Note:** When using `<TextInput>` in modals, it's recommended to wrap it in a `<Label>` component instead of an `<ActionRow>` (deprecated).
 
 - **Props (`TextInputProps`):**
   - `customId: string`: Developer-defined identifier for the input (max 100 characters). This is sent back when the modal is submitted. Must be unique within the modal.
   - `style: TextInputStyle`: The style of the text input:
     - `TextInputStyle.Short`: Single-line input field
     - `TextInputStyle.Paragraph`: Multi-line input field (textarea)
-  - `label: string`: Label text displayed above the input field (max 45 characters).
+  - `label: string`: Label text displayed above the input field (max 45 characters). **Deprecated:** Use `<Label>` component's `label` prop instead.
   - `placeholder?: string`: Placeholder text displayed when the input is empty (max 100 characters).
   - `value?: string`: Pre-filled value for the input (max 4000 characters).
   - `required?: boolean`: Whether the input must be filled before submitting the modal (defaults to `true`).
@@ -706,6 +738,191 @@ This provides a more semantic or familiar way to structure your text content.
 
 ---
 
+## Modal Examples
+
+DisJSX provides comprehensive support for modals with the new `<Label>`, `<FileUpload>`, and `<TextDisplay>` components. Below are complete examples demonstrating various modal patterns. All examples can be found in the `examples/modals/` directory.
+
+### Basic Modal with Label Components
+
+The recommended way to structure modals is using `<Label>` components (replaces the deprecated `<ActionRow>` pattern):
+
+```tsx
+import { Modal, Label, TextInput, TextInputStyle, renderDiscordModal } from "disjsx";
+
+const modal = (
+	<Modal title="Edit Profile" customId="profile_modal">
+		<Label label="Username" description="Choose a display name for your profile">
+			<TextInput
+				customId="username"
+				style={TextInputStyle.Short}
+				placeholder="Enter your username"
+				maxLength={32}
+				required
+			/>
+		</Label>
+		
+		<Label label="Bio" description="Tell the community about yourself">
+			<TextInput
+				customId="bio"
+				style={TextInputStyle.Paragraph}
+				placeholder="Tell us about yourself..."
+				maxLength={1000}
+				required={false}
+			/>
+		</Label>
+	</Modal>
+);
+
+const payload = renderDiscordModal(modal);
+```
+
+### Modal with File Upload
+
+Use `<FileUpload>` to allow users to upload files:
+
+```tsx
+import { Modal, Label, TextInput, TextInputStyle, FileUpload, TextDisplay, renderDiscordModal } from "disjsx";
+
+const bugReportModal = (
+	<Modal title="Bug Report" customId="bug_report_modal">
+		<TextDisplay>
+			Please provide detailed information about the bug. **Screenshots are required!**
+		</TextDisplay>
+
+		<Label label="Description of the bug" description="Please describe the cause and effects">
+			<TextInput
+				customId="description"
+				style={TextInputStyle.Paragraph}
+				minLength={30}
+				placeholder="Whenever I click..."
+				required
+			/>
+		</Label>
+
+		<Label label="Provide screenshots" description="At least two pictures required">
+			<FileUpload customId="screenshots" minValues={2} maxValues={10} required />
+		</Label>
+	</Modal>
+);
+```
+
+### Modal with Select Menus
+
+Labels can wrap any interactive component, including select menus:
+
+```tsx
+import { Modal, Label, UserSelect, RoleSelect, ChannelSelect, ChannelTypes, TextDisplay, renderDiscordModal } from "disjsx";
+
+const roleAssignmentModal = (
+	<Modal title="Assign Roles" customId="role_assignment_modal">
+		<TextDisplay>
+			## Role Assignment Tool
+			
+			Select users, roles, and notification channel below.
+		</TextDisplay>
+
+		<Label label="Select Users" description="Choose users to assign roles to">
+			<UserSelect customId="users_selected" maxValues={10} required />
+		</Label>
+
+		<Label label="Select Roles" description="Choose which roles to assign">
+			<RoleSelect customId="roles_selected" maxValues={5} required />
+		</Label>
+
+		<Label label="Notification Channel">
+			<ChannelSelect
+				customId="announcement_channel"
+				channelTypes={[ChannelTypes.GuildText, ChannelTypes.GuildAnnouncement]}
+				required
+			/>
+		</Label>
+	</Modal>
+);
+```
+
+### Complex Modal with Multiple Component Types
+
+Combine `<TextDisplay>`, `<Label>`, `<TextInput>`, `<FileUpload>`, and various selects:
+
+```tsx
+import {
+	Modal,
+	Label,
+	TextInput,
+	TextInputStyle,
+	FileUpload,
+	StringSelect,
+	SelectOption,
+	MentionableSelect,
+	TextDisplay,
+	renderDiscordModal,
+} from "disjsx";
+
+const contentSubmissionModal = (
+	<Modal title="Submit Content" customId="content_submission_modal">
+		<TextDisplay>
+			# Content Submission Form
+			
+			Submit your creative content to be featured!
+			
+			**Guidelines:**
+			- Original content only
+			- Must follow community guidelines
+		</TextDisplay>
+
+		<Label label="Content Title">
+			<TextInput
+				customId="title"
+				style={TextInputStyle.Short}
+				maxLength={100}
+				placeholder="My Amazing Artwork"
+				required
+			/>
+		</Label>
+
+		<Label label="Category">
+			<StringSelect customId="category" placeholder="Select a category" required>
+				<SelectOption label="🎨 Artwork" value="artwork" />
+				<SelectOption label="📝 Writing" value="writing" />
+				<SelectOption label="🎵 Music" value="music" />
+				<SelectOption label="💻 Code/Project" value="code" />
+			</StringSelect>
+		</Label>
+
+		<Label label="Upload Files" description="Upload your content files">
+			<FileUpload customId="content_files" minValues={1} maxValues={5} required />
+		</Label>
+
+		<Label label="Credits (optional)" description="Mention collaborators">
+			<MentionableSelect
+				customId="credits"
+				placeholder="Select users or roles to credit"
+				maxValues={10}
+				required={false}
+			/>
+		</Label>
+	</Modal>
+);
+```
+
+### Available Modal Example Files
+
+The `examples/modals/` directory contains complete, runnable examples:
+
+- **`user-profile.tsx`** - Basic profile editing modal with text inputs
+- **`feedback-form.tsx`** - Feedback collection with text inputs and select menus
+- **`bug-report.tsx`** - Bug report form with file uploads and text inputs
+- **`role-assignment.tsx`** - Role management with user, role, and channel selects
+- **`poll-creator.tsx`** - Poll creation with multiple input types
+- **`content-submission.tsx`** - Complex submission form with all component types
+
+Run any example with:
+```bash
+bun run examples/modals/feedback-form.tsx
+```
+
+---
+
 ## Utility Objects & Enums
 
 DisJSX provides several utility objects/enums that map to Discord constants:
@@ -759,13 +976,13 @@ console.log(discordPayload);
 ### For Modals
 
 ```tsx
-import { Modal, ActionRow, TextInput, TextInputStyle, renderDiscordModal } from "disjsx";
+import { Modal, Label, TextInput, TextInputStyle, renderDiscordModal } from "disjsx";
 
 const myJsxModal = (
 	<Modal title="User Input" customId="user_input_modal">
-		<ActionRow>
-			<TextInput customId="name" label="Your Name" style={TextInputStyle.Short} />
-		</ActionRow>
+		<Label label="Your Name" description="Enter your full name">
+			<TextInput customId="name" style={TextInputStyle.Short} required />
+		</Label>
 	</Modal>
 );
 
@@ -775,3 +992,5 @@ console.log(modalPayload);
 ```
 
 Both `renderDiscordMessage` and `renderDiscordModal` support the same validation options for comprehensive error checking and debugging.
+
+**Note:** The old `<ActionRow>` pattern for modals is deprecated. Use `<Label>` to wrap modal inputs instead.

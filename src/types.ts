@@ -102,6 +102,10 @@ export enum ComponentType {
 	Separator = 14,
 	/** Container that visually groups a set of components. */
 	Container = 17,
+	/** Container associating a label and description with a component (modals). */
+	Label = 18,
+	/** File upload component for modals. */
+	FileUpload = 19,
 }
 
 /**
@@ -623,8 +627,10 @@ interface BaseSelectProps {
 	minValues?: number;
 	/** Maximum number of items that can be chosen (1-25). Defaults to 1. */
 	maxValues?: number;
-	/** Whether the select menu is disabled. Defaults to `false`. */
+	/** Whether the select menu is disabled in messages. Defaults to `false`. */
 	disabled?: boolean;
+	/** Whether the select menu is required in modals. Defaults to `true`. Only available in modals. */
+	required?: boolean;
 	/** Optional identifier for the component. */
 	id?: number;
 }
@@ -782,8 +788,8 @@ export interface TextInputProps {
 	customId: string;
 	/** The Text Input Style. */
 	style: TextInputStyle;
-	/** Label for this component, max 45 characters. */
-	label: string;
+	/** Label for this component, max 45 characters. @deprecated Use Label component's label prop instead */
+	label?: string;
 	/** Minimum input length for a text input; min 0, max 4000. */
 	minLength?: number;
 	/** Maximum input length for a text input; min 1, max 4000. */
@@ -804,7 +810,7 @@ interface TextInputPayload extends InteractiveComponent {
 	/** The Text Input Style. */
 	style: TextInputStyle;
 	/** Label for this component, max 45 characters. */
-	label: string;
+	label?: string;
 	/** Minimum input length for a text input; min 0, max 4000. */
 	min_length?: number;
 	/** Maximum input length for a text input; min 1, max 4000. */
@@ -817,9 +823,64 @@ interface TextInputPayload extends InteractiveComponent {
 	placeholder?: string;
 }
 
-// Embed related structures (common for Discord messages)
-// These are not fully detailed in the provided "Component Reference" for V2 components,
-// but are relevant for legacy messages and general Discord message structure.
+/**
+ * Props for the Label component (used in modals).
+ * A Label wraps modal components with text as a label and optional description.
+ * @see {@link https://discord.com/developers/docs/interactions/message-components#label}
+ */
+export interface LabelProps {
+	/** The label text, max 45 characters. */
+	label: string;
+	/** Optional description text for the label, max 100 characters. */
+	description?: string;
+	/**
+	 * The component within the label. Can be TextInput, StringSelect, UserSelect,
+	 * RoleSelect, MentionableSelect, or ChannelSelect.
+	 */
+	children: React.ReactNode;
+	/** Optional identifier for the component. */
+	id?: number;
+}
+
+/** Payload structure for a Label component. */
+interface LabelPayload extends BaseComponent {
+	type: ComponentType.Label;
+	/** The label text, max 45 characters. */
+	label: string;
+	/** Optional description text for the label, max 100 characters. */
+	description?: string;
+	/** The component within the label. */
+	component: AnyComponentPayload;
+}
+
+/**
+ * Props for the FileUpload component (used in modals).
+ * Allows users to upload files in modals.
+ * @see {@link https://discord.com/developers/docs/interactions/message-components#file-upload}
+ */
+export interface FileUploadProps {
+	/** Developer-defined identifier, max 100 characters. */
+	customId: string;
+	/** Minimum number of files that must be uploaded (0-10). Defaults to 1. */
+	minValues?: number;
+	/** Maximum number of files that can be uploaded (1-10). Defaults to 1. */
+	maxValues?: number;
+	/** Whether the file upload is required to be filled in a modal. Defaults to `true`. */
+	required?: boolean;
+	/** Optional identifier for the component. */
+	id?: number;
+}
+
+/** Payload structure for a FileUpload component. */
+interface FileUploadPayload extends InteractiveComponent {
+	type: ComponentType.FileUpload;
+	/** Minimum number of files that must be uploaded (0-10). Defaults to 1. */
+	min_values?: number;
+	/** Maximum number of files that can be uploaded (1-10). Defaults to 1. */
+	max_values?: number;
+	/** Whether the file upload is required. Defaults to `true`. */
+	required?: boolean;
+}
 
 /** Props for the author section of an embed. */
 export interface EmbedAuthorProps {
@@ -988,7 +1049,7 @@ export interface ModalProps {
 	/** Developer-defined identifier for the modal, max 100 characters. */
 	customId: string;
 	/**
-	 * Child components. Can only contain Action Rows with Text Input components.
+	 * Child components. Can contain Label (recommended), TextDisplay, or ActionRow (deprecated) components.
 	 */
 	children: React.ReactNode;
 }
@@ -1001,8 +1062,8 @@ interface ModalData {
 	title: string;
 	/** Developer-defined identifier for the modal, max 100 characters. */
 	custom_id: string;
-	/** Array of Action Row components containing Text Input components. */
-	components: ActionRowPayload[];
+	/** Array of components (Label, TextDisplay, or ActionRow). */
+	components: AnyComponentPayload[];
 }
 
 /**
@@ -1092,7 +1153,9 @@ type AnyComponentPayload =
 	| MediaGalleryPayload
 	| FilePayload
 	| SeparatorPayload
-	| ContainerPayload;
+	| ContainerPayload
+	| LabelPayload
+	| FileUploadPayload;
 
 export type {
 	EmojiObject,
@@ -1119,6 +1182,8 @@ export type {
 	FilePayload,
 	SeparatorPayload,
 	ContainerPayload,
+	LabelPayload,
+	FileUploadPayload,
 	SelectOptionPayload,
 	BaseSelectProps,
 	MediaGalleryItemPayload,

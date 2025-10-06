@@ -29,6 +29,7 @@ import {
 import type { ReactElement, ReactNode } from "react";
 import { Children, isValidElement, Fragment } from "react";
 import { getDISJSXType, getProcessedElement } from "./utils";
+import { processChildrenToString } from "./processChildrenToString";
 
 /**
  * Represents a validation error or warning found during component validation.
@@ -302,7 +303,7 @@ export class ComponentValidator {
 	}
 
 	/**
-	 * Validates components within a modal (only ActionRows with TextInputs).
+	 * Validates components within a modal (Label, TextDisplay, ActionRow, or FileUpload).
 	 * @param children The modal's child components
 	 */
 	private validateModalComponents(children: ReactNodeType<ModalProps>[]) {
@@ -316,13 +317,18 @@ export class ComponentValidator {
 			const processedChild = getProcessedElement(child);
 			const childType = getDISJSXType(processedChild);
 
-			if (childType !== DISJSX.ActionRow) {
-				this.addError("Modals can only contain Action Row components", childType);
-
-				continue;
+			if (childType === DISJSX.ActionRow) {
+				// Legacy ActionRow support (deprecated for new modals)
+				this.validateActionRowForModal(processedChild as ReactElement<ActionRowProps>);
+			} else if (childType === DISJSX.Label) {
+				this.validateLabel(processedChild as ReactElement);
+			} else if (childType === DISJSX.TextDisplay) {
+				this.validateTextDisplay(processedChild as ReactElement);
+			} else if (childType === DISJSX.FileUpload) {
+				this.validateFileUpload(processedChild as ReactElement);
+			} else {
+				this.addError("Modals can only contain Label, TextDisplay, FileUpload, or ActionRow (deprecated) components", childType);
 			}
-
-			this.validateActionRowForModal(processedChild as ReactElement<ActionRowProps>);
 		}
 	}
 
@@ -977,10 +983,6 @@ export class ComponentValidator {
 			this.addError(`Text Input customId cannot exceed ${VALIDATION_LIMITS.CUSTOM_ID_MAX_LENGTH} characters`);
 		}
 
-		if (!props.label) {
-			this.addError("Text Input must have a label property");
-		}
-
 		if (props.minLength !== undefined && props.maxLength !== undefined) {
 			if (props.minLength > props.maxLength) {
 				this.addError("Text Input minLength cannot be greater than maxLength");
@@ -993,6 +995,111 @@ export class ComponentValidator {
 
 		if (props.value && props.value.length > VALIDATION_LIMITS.TEXT_INPUT_MAX_LENGTH) {
 			this.addError(`Text Input value cannot exceed ${VALIDATION_LIMITS.TEXT_INPUT_MAX_LENGTH} characters`);
+		}
+
+		this.path.pop();
+	}
+
+	/**
+	 * Validates Label components for modals.
+	 * @param element The Label component to validate
+	 */
+	private validateLabel(element: ReactElement) {
+		this.path.push("Label");
+		const props = element.props as { label?: string; description?: string; children?: ReactNode; id?: number };
+
+		if (!props.label) {
+			this.addError("Label must have a label property");
+		} else if (props.label.length > 45) {
+			this.addError("Label label cannot exceed 45 characters");
+		}
+
+		if (props.description && props.description.length > 100) {
+			this.addError("Label description cannot exceed 100 characters");
+		}
+
+		// Validate the child component
+		const children = Children.toArray(props.children);
+
+		if (children.length === 0) {
+			this.addError("Label must contain a child component (TextInput, Select, or FileUpload)");
+		} else {
+			for (const child of children) {
+				if (!isValidElement(child)) {
+					continue;
+				}
+
+				const processedChild = getProcessedElement(child);
+				const childType = getDISJSXType(processedChild);
+
+				if (childType === DISJSX.TextInput) {
+					this.validateTextInput(processedChild as ReactElement<TextInputProps>);
+				} else if (childType === DISJSX.StringSelect) {
+					this.validateStringSelect(processedChild as ReactElement<StringSelectProps>);
+				} else if (
+					childType === DISJSX.UserSelect ||
+					childType === DISJSX.RoleSelect ||
+					childType === DISJSX.MentionableSelect ||
+					childType === DISJSX.ChannelSelect
+				) {
+					this.validateAutoPopulatedSelect(
+						processedChild as ReactElement<UserSelectProps | RoleSelectProps | MentionableSelectProps | ChannelSelectProps>,
+						childType,
+					);
+				} else if (childType === DISJSX.FileUpload) {
+					this.validateFileUpload(processedChild as ReactElement);
+				} else {
+					this.addError("Label can only contain TextInput, Select, or FileUpload components", childType);
+				}
+			}
+		}
+
+		this.path.pop();
+	}
+
+	/**
+	 * Validates FileUpload components for modals.
+	 * @param element The FileUpload component to validate
+	 */
+	private validateFileUpload(element: ReactElement) {
+		this.path.push("FileUpload");
+		const props = element.props as { customId?: string; minValues?: number; maxValues?: number; required?: boolean; id?: number };
+
+		if (!props.customId) {
+			this.addError("FileUpload must have a customId property");
+		} else if (props.customId.length > VALIDATION_LIMITS.CUSTOM_ID_MAX_LENGTH) {
+			this.addError(`FileUpload customId cannot exceed ${VALIDATION_LIMITS.CUSTOM_ID_MAX_LENGTH} characters`);
+		}
+
+		if (props.minValues !== undefined && (props.minValues < 0 || props.minValues > 10)) {
+			this.addError("FileUpload minValues must be between 0 and 10");
+		}
+
+		if (props.maxValues !== undefined && (props.maxValues < 1 || props.maxValues > 10)) {
+			this.addError("FileUpload maxValues must be between 1 and 10");
+		}
+
+		if (props.minValues !== undefined && props.maxValues !== undefined && props.minValues > props.maxValues) {
+			this.addError("FileUpload minValues cannot be greater than maxValues");
+		}
+
+		this.path.pop();
+	}
+
+	/**
+	 * Validates TextDisplay components.
+	 * @param element The TextDisplay component to validate
+	 */
+	private validateTextDisplay(element: ReactElement) {
+		this.path.push("TextDisplay");
+		const props = element.props as { children?: ReactNode; id?: number };
+
+		if (props.children) {
+			const content = processChildrenToString(props.children);
+
+			if (content.length > VALIDATION_LIMITS.MESSAGE_CONTENT_MAX_LENGTH) {
+				this.addError(`TextDisplay content cannot exceed ${VALIDATION_LIMITS.MESSAGE_CONTENT_MAX_LENGTH} characters`);
+			}
 		}
 
 		this.path.pop();
