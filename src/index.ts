@@ -18,6 +18,24 @@ import { getDISJSXType, getProcessedElement } from "@disjsx/utils.ts";
 import { processChildrenToString } from "@disjsx/processChildrenToString.ts";
 import { validateComponent, validateUniqueCustomIds } from "./validation";
 
+/**
+ * Recursively flattens arrays that may contain nested arrays (from nested fragments).
+ * This ensures that fragments at any nesting depth are properly flattened.
+ */
+const flattenDeep = (arr: unknown[]): AnyComponentPayload[] => {
+	const result: AnyComponentPayload[] = [];
+
+	for (const item of arr) {
+		if (Array.isArray(item)) {
+			result.push(...flattenDeep(item));
+		} else {
+			result.push(item as AnyComponentPayload);
+		}
+	}
+
+	return result;
+};
+
 // Exporting all these in the off chance someone wants to use them directly (idk why you would tho)
 export * from "./disjsxTypes";
 export * from "./types";
@@ -116,14 +134,22 @@ export const renderDiscordMessage = (
 					const processedNode = processNode(fragmentChild);
 
 					if (processedNode !== null) {
-						v2Components.push(processedNode as AnyComponentPayload);
+						if (Array.isArray(processedNode)) {
+							v2Components.push(...flattenDeep(processedNode));
+						} else {
+							v2Components.push(processedNode as AnyComponentPayload);
+						}
 					}
 				}
 			} else {
 				const processedNode = processNode(child);
 
 				if (processedNode !== null) {
-					v2Components.push(processedNode as AnyComponentPayload);
+					if (Array.isArray(processedNode)) {
+						v2Components.push(...flattenDeep(processedNode));
+					} else {
+						v2Components.push(processedNode as AnyComponentPayload);
+					}
 				}
 			}
 		}
@@ -301,7 +327,11 @@ export const renderDiscordModal = (
 		const processedNode = processNode(child);
 
 		if (processedNode !== null) {
-			components.push(processedNode as AnyComponentPayload);
+			if (Array.isArray(processedNode)) {
+				components.push(...flattenDeep(processedNode));
+			} else {
+				components.push(processedNode as AnyComponentPayload);
+			}
 		}
 	}
 
