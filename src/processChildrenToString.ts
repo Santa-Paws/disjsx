@@ -50,6 +50,15 @@ export const processChildrenToString = (childrenNodes: ReactNode, listIndentPref
 			continue;
 		}
 
+		if (Array.isArray(rawCurrentNode)) {
+			const nestedContent = processChildrenToString(rawCurrentNode, listIndentPrefix);
+
+			resultString += nestedContent;
+			previousNodeWasBlock = nestedContent.endsWith("\n") || previousNodeWasBlock;
+			continue;
+		}
+
+
 		if (typeof rawCurrentNode === "string" || typeof rawCurrentNode === "number") {
 			resultString += String(rawCurrentNode);
 			previousNodeWasBlock = false;
