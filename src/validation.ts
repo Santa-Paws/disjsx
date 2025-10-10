@@ -66,19 +66,28 @@ export interface ValidationResult {
  * @returns Flattened array with Fragment children expanded
  */
 const expandFragments = (children: ReactNode[]): ReactNode[] => {
-	const expanded: ReactNode[] = [];
-	
-	for (const child of children) {
-		if (isValidElement(child) && child.type === Fragment) {
-			const fragmentChildren = Children.toArray((child.props as { children: ReactNode }).children);
+    const expanded: ReactNode[] = [];
 
-			expanded.push(...expandFragments(fragmentChildren));
-		} else {
-			expanded.push(child);
-		}
-	}
-	
-	return expanded;
+    for (const child of children) {
+        if (isValidElement(child)) {
+            const element = getProcessedElement(child as ReactElement);
+
+            if (element.type === Fragment) {
+                const fragmentChildren = Children.toArray(
+                    (element.props as { children: ReactNode }).children,
+                );
+
+                expanded.push(...expandFragments(fragmentChildren));
+                continue;
+            }
+
+            expanded.push(element);
+        } else {
+            expanded.push(child);
+        }
+    }
+
+    return expanded;
 };
 
 /**
